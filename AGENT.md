@@ -330,6 +330,11 @@ vercel --prod
 
 #### Railway Deployment
 ```bash
+# Install Railway CLI
+npm install -g @railway/cli
+# Note: If installed via npm, you may need to fix permissions:
+chmod +x $(which railway)
+
 # Login to Railway (get credentials from Engineering Lead)
 railway login
 
@@ -340,6 +345,41 @@ railway link
 # Deploy via git push or Railway CLI
 railway up
 ```
+
+### Railway MCP Integration
+
+**Important: Railway MCP Server Setup**
+
+The Railway MCP (Model Context Protocol) server enables AI assistants to interact with Railway services directly. To use Railway commands through your AI assistant:
+
+1. **Prerequisites:**
+   - Railway CLI must be installed and executable
+   - You must be logged in via `railway login` before starting your AI session
+   - MCP server configuration in `.mcp.json` (already included in this boilerplate)
+
+2. **Initial Setup:**
+```bash
+# Install Railway CLI globally
+npm install -g @railway/cli
+
+# Fix permissions if installed via npm (common issue)
+chmod +x $(which railway)
+
+# Login to Railway (required before AI assistant can use Railway commands)
+railway login
+```
+
+3. **Available MCP Commands:**
+   - List Railway projects
+   - Check Railway CLI status
+   - Deploy to Railway
+   - Manage environment variables
+
+4. **Troubleshooting:**
+   - **"railway: Permission denied"**: Run `chmod +x $(which railway)` to fix permissions
+   - **"railway: not found"**: Ensure Railway CLI is installed globally
+   - **Authentication errors**: Run `railway login` in your terminal before starting AI session
+   - **MCP connection issues**: Restart your AI assistant after logging into Railway
 
 **Platform Detection:**
 - Vercel: Automatically detected via `VERCEL=1` environment variable

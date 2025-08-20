@@ -32,22 +32,33 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 npm install
 ```
 
-2. **Install Vercel CLI globally:**
+2. **Install Vercel CLI globally (if using Vercel):**
 ```bash
 npm i -g vercel
 ```
 
-3. **Login to Vercel:**
+3. **Install Railway CLI globally (if using Railway):**
+```bash
+npm install -g @railway/cli
+
+# Fix permissions if you encounter "Permission denied" error
+chmod +x $(which railway)
+
+# Login to Railway (required for deployment and MCP integration)
+railway login
+```
+
+4. **Login to Vercel (if using Vercel):**
 ```bash
 vercel login
 ```
 
-4. **Link to the Vercel project:**
+5. **Link to the Vercel project:**
 ```bash
 vercel link
 ```
 
-5. **Pull environment variables from Vercel:**
+6. **Pull environment variables from Vercel:**
 ```bash
 vercel env pull .env.development.local
 ```
@@ -140,9 +151,11 @@ The following environment variables are required:
 
 These are automatically pulled from Vercel when you run `vercel env pull .env.development.local`.
 
-## Deploy on Vercel
+## Deployment
 
-This project is configured for deployment on Vercel:
+This project supports deployment on both **Vercel** and **Railway**.
+
+### Deploy on Vercel
 
 ```bash
 # Deploy to production
@@ -153,5 +166,20 @@ vercel
 ```
 
 The application is automatically deployed on every push to the main branch.
+
+### Deploy on Railway
+
+```bash
+# Ensure you're logged in
+railway login
+
+# Link to your Railway project
+railway link
+
+# Deploy to Railway
+railway up
+```
+
+**Note:** Environment variables should be configured in the Railway dashboard.
 
 Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
