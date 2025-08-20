@@ -1,6 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aceable Vibing Boilerplate
+
+## Initial Install
+
+1. Follow [Github CLI](https://github.com/cli/cli#installation) installation
+2. Create a new folder for your project in your personal drive
+3. Open VSCode or Cursor in your new folder
+4. Open the IDE terminal and run
+
+```shell
+    gh repo fork https://github.com/aceable/ai-boilerplate.git --clone
+    mv ai-boilerplate/* ai-boilerplate/.* .
+    rmdir ai-boilerplate
+```
+
+5. Run Claude, Cursor, or Copilot as usual
 
 ## Getting Started
+
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ### Prerequisites
 
