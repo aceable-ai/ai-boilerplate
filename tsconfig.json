@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "ES2017",
+        "target": "ES2022",
         "lib": [
             "dom",
             "dom.iterable",
@@ -8,22 +8,36 @@
         ],
         "allowJs": true,
         "skipLibCheck": true,
+        // Core strict settings - enables all strict mode family options
         "strict": true,
-        "noImplicitAny": true,
+        // Additional strict checks beyond base "strict" flag
+        "exactOptionalPropertyTypes": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitOverride": true,
         "noImplicitReturns": true,
-        "noEmit": true,
-        "esModuleInterop": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noUncheckedIndexedAccess": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "useUnknownInCatchVariables": true,
+        "forceConsistentCasingInFileNames": true,
+        // Module handling
         "module": "esnext",
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
+        "esModuleInterop": true,
+        "verbatimModuleSyntax": true,
+        // JSX and Next.js specific
         "jsx": "preserve",
+        "noEmit": true,
         "incremental": true,
         "plugins": [
             {
                 "name": "next"
             }
         ],
+        // Path mapping
         "paths": {
             "@/*": [
                 "./src/*"
