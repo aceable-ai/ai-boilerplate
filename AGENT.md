@@ -13,6 +13,24 @@
    - Vercel: Get credentials from Engineering Lead
    - Railway: Get credentials from Engineering Lead
 
+## Claude Code Slash Commands
+
+**Setup & Environment:**
+- `/check` - Run comprehensive development prerequisites validation
+- `/setup-all` - Complete automated development environment setup
+- `/auth` - Authenticate with all required services (GitHub, Vercel, database)
+- `/gh-setup` - Configure GitHub CLI authentication
+
+**Development Workflow:**
+- `/dev` - Start development server with Turbopack
+- `/build` - Build production-ready application
+- `/lint` - Run ESLint and TypeScript validation
+- `/test` - Run test suite
+
+**Database Management:**
+- `/db-studio` - Open Drizzle Studio database admin interface
+- `/db-push` - Push database schema changes
+
 ## Project Structure
 ```
 .ai/
@@ -266,6 +284,31 @@ git commit -m "refactor(components): extract UserCard component"
 feature/user-authentication
 bugfix/login-redirect-issue
 hotfix/security-patch
+```
+
+### Development Prerequisites Commands
+
+**Prerequisites Validation:**
+```bash
+# Run comprehensive development environment check
+./scripts/check-prerequisites.sh
+
+# Checks include:
+# ✅ Node.js version (22.x required)
+# ✅ npm version
+# ✅ Project dependencies (package.json, node_modules)
+# ✅ Vercel CLI installation and authentication status
+# ✅ NVM setup and configuration
+```
+
+**Setup Commands:**
+```bash
+# Complete development environment setup
+./scripts/setup-all.sh          # Runs all setup scripts
+
+# Individual setup scripts
+./scripts/setup-auth.sh          # Authentication setup
+./scripts/setup-github-cli.sh    # GitHub CLI configuration
 ```
 
 ### Code Quality Gates
