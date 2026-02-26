@@ -22,7 +22,7 @@ Then: `npm install` → `cp .env.example .env.local` → fill credentials → `n
 
 ## Stack
 
-Next.js 15 (App Router, Turbopack) · React 19 · TypeScript strict · Tailwind CSS v4 · Drizzle ORM · Neon Postgres · Clerk Auth · Vercel AI SDK · Railway or Vercel deployment
+Next.js 15 (App Router, Turbopack) · React 19 · TypeScript strict · Tailwind CSS v4 · Drizzle ORM · Neon Postgres · Clerk Auth · AI SDK · Railway deployment
 
 ---
 
@@ -127,9 +127,19 @@ These are non-negotiable behaviors. Follow them in every session.
 
 ## Skills & Extensions
 
-```bash
-npx skills add aceable/acewares   # tickets, review, retro, Playwright, wiki
-# Browse more: https://skills.sh/
-```
+**Pre-installed skills** (in `.agents/skills/`, auto-linked on `npm install`):
 
-Skills install into `.agents/skills/` and are symlinked to `.claude/skills/` via `npm install`.
+| Skill | What it covers |
+|-------|---------------|
+| `next-best-practices` | File conventions, RSC boundaries, async APIs, route handlers |
+| `tailwind-design-system` | Tailwind v4, design tokens, component patterns |
+| `vercel-react-best-practices` | React/Next.js performance, data fetching, bundle optimization |
+| `web-design-guidelines` | Accessibility, UI best practices |
+| `playwright-cli` | Playwright CLI usage for writing and debugging E2E tests |
+| `find-skills` | Discover and install additional skills |
+
+```bash
+# Add more skills
+npx skills add <name>
+# Browse: https://skills.sh/
+```

@@ -1,10 +1,10 @@
 {
     "$schema": "https://railway.app/railway.schema.json",
     "build": {
-        "buildCommand": "npm install --production=false && npm run build"
+        "buildCommand": "npm run build"
     },
     "deploy": {
-        "startCommand": "RAILWAY_DEPLOYMENT=true next start -p ${PORT:-3000}",
+        "startCommand": "npm run db:migrate && next start -p $PORT",
         "healthcheckPath": "/",
         "healthcheckTimeout": 100
     }

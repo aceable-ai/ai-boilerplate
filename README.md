@@ -1,185 +1,91 @@
-# Aceable AI Boilerplate
+# AI Boilerplate
 
-## Initial Install
+A production-ready Next.js starter for vibe coding with Claude, Codex, or Cursor. Includes auth, database, AI, and one-command Railway deployment — all wired up so you can skip setup and build.
 
-1. Follow [Github CLI](https://github.com/cli/cli#installation) installation
-2. Create a new folder for your project in your personal drive
-3. Open VSCode or Cursor in your new folder
-4. Open the IDE terminal and run
+---
 
-```shell
-    gh repo fork https://github.com/aceable/ai-boilerplate.git --clone
-    mv ai-boilerplate/* ai-boilerplate/.* .
-    rmdir ai-boilerplate
+## Prerequisites
+
+Before you start, make sure these are installed:
+
+| Tool | Check | Install |
+|------|-------|---------|
+| **nvm** | `nvm --version` | `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh \| bash` |
+| **Node.js** | `node --version` | `nvm install && nvm use` |
+| **git** | `git --version` | macOS: `xcode-select --install` |
+| **GitHub CLI** | `gh auth status` | `npm run setup:gh` (after step 2 below) |
+| **Railway CLI** | `railway --version` | `npm install -g @railway/cli` |
+
+---
+
+## Setup
+
+**1. Create your project from this template**
+
+```bash
+gh repo create my-app-name --template aceable/ai-boilerplate --clone --public
+cd my-app-name
 ```
 
-5. Run Claude, Cursor, or Copilot as usual
+**2. Install dependencies**
 
-## Getting Started
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-### Prerequisites
-
-1. **Node.js**: This project requires Node.js 20.x+ LTS
-2. **Vercel CLI**: For deployment and environment management
-3. **Neon Postgres**: Database hosted on Neon
-
-### Initial Setup
-
-1. **Install dependencies:**
 ```bash
 npm install
 ```
 
-2. **Install Vercel CLI globally (if using Vercel):**
+**3. Set up environment variables**
+
 ```bash
-npm i -g vercel
+cp .env.example .env.local
 ```
 
-3. **Install Railway CLI globally (if using Railway):**
+Open `.env.local` and fill in each value. You'll need accounts for:
+- [Neon](https://neon.tech) — free Postgres database
+- [Clerk](https://clerk.com) — free auth
+- [OpenAI](https://platform.openai.com) — API key for AI features
+
+**4. Push the database schema**
+
 ```bash
-npm install -g @railway/cli
-
-# Fix permissions if you encounter "Permission denied" error
-chmod +x $(which railway)
-
-# Login to Railway (required for deployment and MCP integration)
-railway login
+npm run db:push
 ```
 
-4. **Login to Vercel (if using Vercel):**
-```bash
-vercel login
-```
-
-5. **Link to the Vercel project:**
-```bash
-vercel link
-```
-
-6. **Pull environment variables from Vercel:**
-```bash
-vercel env pull .env.development.local
-```
-
-This will create a `.env.development.local` file with your Neon Postgres connection string and other environment variables.
-
-### Running the Application
-
-With Neon Postgres, no local database setup is required. Simply run:
+**5. Start the dev server**
 
 ```bash
 npm run dev
 ```
 
-The application will connect to your Neon database automatically using the DATABASE_URL from your environment file.
+Open [http://localhost:3003](http://localhost:3003). You're running.
 
-Open [http://localhost:3003](http://localhost:3003) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Database Management
-
-This project uses **Drizzle ORM** with **Neon Postgres**. Database schema is managed through code-first migrations.
-
-### Database Schema Workflow
+## Deploy to Railway
 
 ```bash
-# After making changes to schema files in src/db/schema/
-npm run db:generate    # Generate migration files
-npm run db:push        # Push schema changes directly to database (development)
-npm run db:studio      # Open database admin interface
-```
-
-**Development vs Production:**
-- **Development**: Use `npm run db:push` to push schema changes directly to your personal DB branch
-- **Production**: Use `npm run db:generate` then `npm run db:migrate` for proper versioned migrations
-
-### Database Branching Workflow
-
-Each developer should work with their own database branch to avoid conflicts:
-
-```bash
-# Install Neon CLI (one-time setup)
-npm install -g neonctl
-
-# Create personal database branch
-neonctl auth  # Login with your Neon credentials
-npm run db:branch:create your-name-dev
-
-# Update .env.development.local with your branch's DATABASE_URL
-# Make schema changes, then push to your branch
-npm run db:push
-```
-
-**Team Workflow:**
-1. **Feature Development**: Work on personal DB branch with `db:push`
-2. **Before PR**: Generate migrations with `db:generate` 
-3. **Code Review**: Review both schema changes AND generated SQL
-4. **Staging**: Test migrations on staging DB branch
-5. **Production**: Apply migrations with `db:migrate`
-
-### Schema Files
-Database schemas are located in `src/db/schema/`:
-- `projects.ts` - Project management tables
-- `users.ts` - User accounts and profiles
-- `projects.ts` - Project management tables
-- `sessions.ts` - Session and authentication data
-- `content.ts` - Content inventory and gaps
-
-All schemas include Zod validation for type safety.
-
-## Environment Variables
-
-The following environment variables are required:
-
-- `DATABASE_URL`: Neon Postgres connection string
-- `OPENAI_API_KEY`: OpenAI API key for content generation
-- `NEXT_PUBLIC_APP_URL`: Application URL (http://localhost:3003 for development)
-
-These are automatically pulled from Vercel when you run `vercel env pull .env.development.local`.
-
-## Deployment
-
-This project supports deployment on both **Vercel** and **Railway**.
-
-### Deploy on Vercel
-
-```bash
-# Deploy to production
-vercel --prod
-
-# Deploy to preview
-vercel
-```
-
-The application is automatically deployed on every push to the main branch.
-
-### Deploy on Railway
-
-```bash
-# Ensure you're logged in
+# Login and link to a new Railway project
 railway login
+railway init
 
-# Link to your Railway project
-railway link
-
-# Deploy to Railway
+# Set your env vars in the Railway dashboard, then deploy
 railway up
 ```
 
-**Note:** Environment variables should be configured in the Railway dashboard.
+Railway auto-deploys on every push to `main` once linked. Migrations run automatically on deploy.
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Database Commands
+
+```bash
+npm run db:push      # sync schema changes to dev DB
+npm run db:studio    # open visual DB browser
+npm run db:generate  # generate versioned migration files
+npm run db:migrate   # apply migrations to production
+```
+
+---
+
+## Learn More
+
+See [AGENTS.md](AGENTS.md) for the full stack, coding standards, AI workflow, and project structure — your AI assistant reads it automatically.
