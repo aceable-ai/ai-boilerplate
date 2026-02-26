@@ -6,7 +6,7 @@ export default clerkMiddleware(async (auth, request) => {
   console.log(`[MIDDLEWARE] ${request.method} ${request.nextUrl.pathname} - isPublic: ${isPublicRoute(request)}`);
   
   // Bypass authentication for Playwright testing (development only)
-  if (process.env.NODE_ENV === 'development' && process.env.PLAYWRIGHT_TESTING === 'true') {
+  if (process.env.NODE_ENV === 'development' && process.env['PLAYWRIGHT_TESTING'] === 'true') {
     console.log(`[MIDDLEWARE] Bypassing auth for Playwright testing: ${request.nextUrl.pathname}`);
     return;
   }

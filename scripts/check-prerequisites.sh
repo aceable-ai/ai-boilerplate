@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo $NVM_DIR
-# Prerequisites Checker for marketing-seo repo
+# Prerequisites Checker
 # Created: 2025-08-22
 # Purpose: Validate all development prerequisites before starting work
 

@@ -222,7 +222,7 @@ npm run time:report     # Generate time breakdown report
 Since this project is forked from `aceable/ai-boilerplate`, you should periodically sync with upstream changes:
 
 ```bash
-# One-time setup: Add upstream remote
+# One-time setup: Add upstream remote (replace with your boilerplate's origin)
 git remote add upstream https://github.com/aceable/ai-boilerplate.git
 
 # Sync with upstream (do this periodically)

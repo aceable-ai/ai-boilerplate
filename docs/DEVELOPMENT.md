@@ -66,7 +66,7 @@ Required variables in `.env.development.local`:
 DATABASE_URL=postgresql://user:pass@host/db  # Neon connection string
 OPENAI_API_KEY=sk-...                        # OpenAI API key
 NEXT_PUBLIC_APP_URL=http://localhost:3003    # App URL
-NEON_PROJECT_ID=spring-night-86511482        # For CLI operations
+NEON_PROJECT_ID=your-neon-project-id        # For CLI operations (find in Neon dashboard)
 ```
 
 ## Troubleshooting

@@ -10,7 +10,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'Jarvis AI',
+  title: 'PROJECT_NAME',
   description: 'Endless AI Experimentation',
 };
 

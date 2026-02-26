@@ -1,4 +1,4 @@
-# Aceable Vibing Boilerplate
+# Aceable AI Boilerplate
 
 ## Initial Install
 
@@ -116,7 +116,7 @@ Each developer should work with their own database branch to avoid conflicts:
 npm install -g neonctl
 
 # Create personal database branch
-neonctl auth  # Login with Aceable credentials
+neonctl auth  # Login with your Neon credentials
 npm run db:branch:create your-name-dev
 
 # Update .env.development.local with your branch's DATABASE_URL
