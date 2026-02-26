@@ -2,19 +2,8 @@
 
 ## Prerequisites
 
-### 1. Node.js and npm
-- Node.js 20.x+ LTS
+- Node.js 24.x (see `.nvmrc`) — install via `nvm install && nvm use`
 - npm 10.x+
-
-### 2. Vercel CLI
-```bash
-npm install -g vercel
-```
-
-### 3. Neon CLI (optional, for database branching)
-```bash
-npm install -g neonctl
-```
 
 ## Quick Start
 
@@ -22,10 +11,13 @@ npm install -g neonctl
 # 1. Install dependencies
 npm install
 
-# 2. Setup Vercel and pull environment variables
-npm run setup
+# 2. Copy and fill in environment variables
+cp .env.example .env.local
 
-# 3. Start the development server
+# 3. Push schema to your database
+npm run db:push
+
+# 4. Start the development server
 npm run dev
 ```
 
@@ -37,65 +29,62 @@ This project uses **Neon Postgres** with **Drizzle ORM**.
 
 ### Database Commands
 ```bash
-# Push schema changes to database (development)
-npm run db:push
-
-# Generate migration files (production)
-npm run db:generate
-
-# Open database admin interface
-npm run db:studio
-
-# Create personal database branch
-npm run db:branch:create your-name-dev
+npm run db:push        # Push schema changes to database (development)
+npm run db:generate    # Generate migration files (production)
+npm run db:studio      # Open database admin interface
 ```
 
-### Database Branching Workflow
-Each developer should work with their own database branch:
+### Database Branching Workflow (Neon)
+Each developer can work with their own Neon branch to avoid conflicts:
 
-1. **Create branch**: `npm run db:branch:create kevin-dev`
-2. **Update .env.development.local** with your branch URL
-3. **Push schema**: `npm run db:push`
-4. **Develop**: Make changes and test
-5. **Generate migrations**: `npm run db:generate` before PR
+1. Install Neon CLI: `npm install -g neonctl && neonctl auth`
+2. Create branch: `npm run db:branch:create your-name-dev`
+3. Copy the new branch's `DATABASE_URL` into `.env.local`
+4. Run `npm run db:push` to apply schema
+
+> **`NEON_PROJECT_ID`** is required for branch commands. Find it in the Neon dashboard and add it to `.env.local`.
+
+### Migration Workflow (Production)
+1. `npm run db:generate` — generate versioned SQL files in `drizzle/`
+2. Review the generated SQL
+3. `npm run db:migrate` — apply to production (runs automatically on Railway deploy)
 
 ## Environment Variables
 
-Required variables in `.env.development.local`:
+Required in `.env.local`:
 ```bash
-DATABASE_URL=postgresql://user:pass@host/db  # Neon connection string
-OPENAI_API_KEY=sk-...                        # OpenAI API key
-NEXT_PUBLIC_APP_URL=http://localhost:3003    # App URL
-NEON_PROJECT_ID=your-neon-project-id        # For CLI operations (find in Neon dashboard)
+DATABASE_URL=postgresql://user:pass@host/db   # Neon connection string
+OPENAI_API_KEY=sk-...                         # OpenAI API key
+NEXT_PUBLIC_APP_URL=http://localhost:3003      # App URL
+NEON_PROJECT_ID=your-neon-project-id          # For Neon CLI branch commands
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_... # Clerk public key
+CLERK_SECRET_KEY=sk_test_...                  # Clerk secret key
 ```
 
 ## Troubleshooting
 
-### "Module not found: mongoose" Error
-This means the Mongoose migration is incomplete. All models should use Drizzle now.
-
 ### Database Connection Issues
-1. Check your `DATABASE_URL` in `.env.development.local`
-2. Verify you can connect: `npm run db:studio`
-3. Try pulling fresh env vars: `vercel env pull .env.development.local`
+1. Check `DATABASE_URL` in `.env.local`
+2. Verify connection: `npm run db:studio`
+3. Re-pull env vars from your deployment platform (Vercel/Railway)
 
 ### Schema Changes Not Reflecting
-1. Push schema changes: `npm run db:push`
-2. Restart development server: `npm run dev`
+1. `npm run db:push`
+2. Restart: `npm run dev`
 
 ## Development Workflow
 
-1. **Feature Development**: Work on personal DB branch
-2. **Schema Changes**: Use `npm run db:push` for development
-3. **Before PR**: Generate migrations with `npm run db:generate`
-4. **Code Review**: Review both code AND migration SQL files
-5. **Production**: Migrations applied automatically on deploy
+1. **Feature Development** — work on personal Neon branch
+2. **Schema Changes** — use `npm run db:push` during development
+3. **Before PR** — generate migrations with `npm run db:generate`
+4. **Code Review** — review both code AND generated SQL
+5. **Production** — migrations applied on deploy via Railway/Vercel
 
-## Stack Overview
+## Stack
 
-- **Frontend**: Next.js 15 (App Router)
-- **Database**: Neon Postgres
-- **ORM**: Drizzle with Zod validation
-- **AI**: Vercel AI SDK with OpenAI
-- **Deployment**: Vercel
-- **Styling**: Tailwind CSS
+- **Framework**: Next.js 15 (App Router, Turbopack)
+- **Auth**: Clerk
+- **Database**: Neon Postgres + Drizzle ORM + Zod validation
+- **AI**: Vercel AI SDK (OpenAI-compatible)
+- **Deployment**: Railway (primary) or Vercel
+- **Styling**: Tailwind CSS v4 + Radix UI

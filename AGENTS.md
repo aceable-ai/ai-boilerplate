@@ -1,0 +1,915 @@
+# AGENTS.md – Engineering & AI Standards
+
+> Canonical shared agent configuration for all AI coding assistants (Claude Code, OpenAI Codex, Cursor, Copilot, Codeium, etc.). Both Claude Code and OpenAI Codex read this file natively.
+
+> **Version**: 2026.1 | **Last Updated**: February 2026
+
+## New User Setup (AI-assisted)
+
+When helping a new user set up this project, guide them through installing the following core tools in order. Check each one before proceeding to the next.
+
+**Core tooling (required):**
+| Tool | Check | Install |
+|------|-------|---------|
+| **nvm** | `nvm --version` | `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh \| bash` |
+| **Node.js** | `node --version` (must match `.nvmrc`) | `nvm install && nvm use` |
+| **git** | `git --version` | macOS: `xcode-select --install` · Linux: `sudo apt install git` |
+| **GitHub CLI** | `gh auth status` | `npm run setup:gh` |
+
+After tooling is confirmed: `npm install` → `cp .env.example .env.local` → fill in credentials → `npm run db:push` → `npm run dev`
+
+## Quick Start
+1. **Node.js 24.x** (via nvm) + **Next.js 15.x** + **PostgreSQL/Drizzle** + **TypeScript** + **Clerk Auth**
+2. Copy `.env.example` → `.env.local` and fill in credentials
+3. **Authentication**: Clerk handles all user auth — middleware in `src/middleware.ts` protects all routes
+4. **Deployment**: Works with **Vercel** or **Railway** — your choice
+
+## Common Commands
+
+**Development:**
+```bash
+npm run dev          # Start dev server (Turbopack, port 3003)
+npm run build        # Production build
+npm run lint:all     # ESLint + TypeScript type-check together
+npm run test:e2e     # Playwright E2E tests
+```
+
+**Database:**
+```bash
+npm run db:push      # Push schema changes to dev database
+npm run db:studio    # Open Drizzle Studio UI
+npm run db:generate  # Generate versioned migration files
+npm run db:migrate   # Apply migrations to production
+```
+
+**Setup (first-time / onboarding):**
+```bash
+npm run check        # Validate all dev prerequisites
+npm run setup        # Full environment setup (Node, deps, gh auth, env file)
+npm run setup:gh     # Install and authenticate GitHub CLI only
+```
+
+## Project Structure
+```
+src/
+├── app/                   # Next.js App Router  
+├── components/ui/         # Base components
+├── components/features/   # Feature components
+├── lib/                   # Utilities & config
+├── hooks/                 # Custom React hooks
+├── middleware.ts          # Clerk authentication protection
+└── types/                 # TypeScript definitions
+docs/                      # Modular documentation
+```
+
+## Core Principles
+- **DRY**: Extract to hooks/utilities
+- **Single Responsibility**: Components do one thing
+- **Type Safety**: Strict TypeScript, no `any`
+- **Testing**: `data-testid` on all components
+- **Performance**: React.memo, proper loading states
+- **Error Handling**: Graceful failures with user feedback
+
+## Required Practices
+✅ Use TodoWrite for all multi-step tasks
+✅ Mark todos completed immediately
+✅ Add `data-testid` to components
+✅ Run `npm run lint:all` before commits
+✅ Keep scratch work in `.scratch/` (gitignored)
+
+## Red Flags 🚨
+- Functions > 50 lines
+- Components > 5 props  
+- Copy-pasted code
+- Missing error boundaries
+- Poor variable naming
+
+## Documentation
+- [Technology Stack](docs/tech-stack.md)
+- [Development Standards](docs/development-standards.md)
+- [E2E Testing](docs/testing-e2e.md)
+
+---
+*Write code that your future self will thank you for.*
+
+---
+
+## 🧠 Senior Engineering Practices
+
+### 1. DRY (Don't Repeat Yourself)
+- Extract common logic into custom hooks
+- Create reusable utility functions in `src/lib/`
+- Use composition over duplication
+
+### 2. Atomic Design Patterns
+```
+components/
+├── ui/           # Atoms (Button, Input, Label)
+├── features/     # Molecules (SearchBar, UserCard)
+└── layouts/      # Organisms (Header, Sidebar, PageLayout)
+```
+
+### 3. Type Safety First
+```typescript
+// Define types before implementation
+interface User {
+  id: string;
+  email: string;
+  profile: UserProfile;
+}
+
+// Use strict TypeScript config
+// tsconfig.json should include:
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true
+  }
+}
+```
+
+### 4. Performance Mindset
+```typescript
+// Use React.memo for expensive components
+export const ExpensiveComponent = React.memo(({ data }: Props) => {
+  return <ComplexVisualization data={data} />;
+});
+
+// Implement proper loading states
+export function DataTable() {
+  const { data, isLoading, error } = useQuery('table-data', fetchData);
+  
+  if (isLoading) return <TableSkeleton />;
+  if (error) return <ErrorBoundary error={error} />;
+  
+  return <Table data={data} />;
+}
+```
+
+### 5. Error Handling
+```typescript
+// Always handle errors gracefully
+async function safeApiCall<T>(fn: () => Promise<T>): Promise<T | null> {
+  try {
+    return await fn();
+  } catch (error) {
+    console.error('API call failed:', error);
+    toast.error('Something went wrong. Please try again.');
+    return null;
+  }
+}
+```
+
+---
+
+## 🤖 AI Integration Workflow
+
+### AI Workflow Best Practices
+
+1. **Start with Planning**: Ask Claude to help architect before coding
+2. **Iterative Refinement**: Use Claude to review and improve code quality
+3. **Documentation**: Generate docs for complex logic/decisions
+4. **Code Review**: Use Claude as a "senior developer" for code review
+5. **Time Tracking**: Automatic session time tracking with phase switching
+
+
+---
+
+# Git Workflow
+
+## Keeping Your Fork Updated
+
+Since this project is forked from `aceable/ai-boilerplate`, you should periodically sync with upstream changes:
+
+```bash
+# One-time setup: Add upstream remote (replace with your boilerplate's origin)
+git remote add upstream https://github.com/aceable/ai-boilerplate.git
+
+# Sync with upstream (do this periodically)
+git fetch upstream
+git checkout main
+git merge upstream/main
+
+# Push updates to your fork
+git push origin main
+```
+
+**Important:** Always review changes before merging, especially if you've customized the boilerplate.
+
+## Branches
+- `main` - Production (auto-deploys Railway) - PROTECTED
+- `feature/*` - Development branches
+
+## 🚫 NEVER DO DIRECT MERGES
+**ALWAYS use Pull Requests. NEVER merge directly into main.**
+
+## ✅ CORRECT WORKFLOW
+```bash
+# 1. Start from latest main
+git checkout main
+git pull origin main
+git checkout -b feature/your-feature-name
+
+# 2. Make changes and commit
+git add .
+git commit -m "feat: description"
+git push origin feature/your-feature-name
+
+# 3. Create PR to main (NEVER merge directly!)
+gh pr create --base main --title "feat: description" --body "Summary of changes"
+
+# 4. After PR is tested and approved, you can merge into main and it will auto deploy to production
+gh pr merge
+
+# 6. Validate merge worked on production
+```
+
+## 🎯 PR RULES
+- **ALL changes** must go through PRs - no exceptions
+- **Feature branches** → PR to `main`
+- **NEVER** merge directly with `git merge` commands
+- **NEVER** push directly to main
+- **ALWAYS** create feature branches from latest main
+
+**Deployment:** main auto-deploy on merge via Railway
+
+### Git Standards
+```bash
+# Conventional commit format
+git commit -m "feat(auth): add JWT token validation"
+git commit -m "fix(api): handle user not found error"
+git commit -m "refactor(components): extract UserCard component"
+
+# Branch naming
+feature/user-authentication
+bugfix/login-redirect-issue
+hotfix/security-patch
+```
+
+### Development Prerequisites Commands
+
+**Prerequisites Validation:**
+```bash
+npm run check        # Validates Node 24.x, env file, gh auth, DB, port 3003
+```
+
+**Setup Commands:**
+```bash
+npm run setup        # Full setup: Node, deps, gh auth, env file
+npm run setup:gh     # GitHub CLI install + authenticate
+```
+
+### Code Quality Gates
+```json
+// package.json scripts
+{
+  "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "pre-commit": "npm run lint && npm run type-check && npm run test",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  }
+}
+```
+
+### Testing & Accessibility Standards
+
+**Required: data-testid Attributes**
+All components MUST include `data-testid` attributes for AI automation and Playwright testing:
+
+```typescript
+// ✅ REQUIRED: Every component needs data-testid
+export function SearchForm({ onSubmit }: SearchFormProps) {
+  return (
+    <form onSubmit={onSubmit} data-testid="search-form">
+      <input 
+        type="text" 
+        placeholder="Search..." 
+        data-testid="search-input"
+      />
+      <button type="submit" data-testid="search-button">
+        Search
+      </button>
+    </form>
+  );
+}
+
+// ✅ Use descriptive, kebab-case testids
+data-testid="user-profile-card"
+data-testid="submit-button"  
+data-testid="error-message"
+data-testid="loading-spinner"
+
+// ❌ DON'T: Generic or missing testids
+data-testid="div1"
+data-testid="button"
+// Missing data-testid entirely
+```
+
+**Benefits:**
+- Enables reliable AI automation for testing
+- Supports Playwright E2E testing  
+- Improves accessibility tooling
+- Facilitates component debugging
+
+**Playwright Standards:**
+- See [Playwright Testing Standards](docs/testing-e2e.md)
+- NEVER use `getByText()` - ALWAYS use `data-testid`
+- Match fixture data to actual API response formats
+- Use complete scenarios, not piecemeal mocking
+
+### Database Development Workflow
+```typescript
+// 1. Define schema in src/db/schema/
+export const users = pgTable('users', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// 2. Generate Zod schemas for validation
+export const insertUserSchema = createInsertSchema(users, {
+  email: z.string().email(),
+  name: z.string().min(1).max(255),
+});
+
+// 3. Push changes to development database
+npm run db:push
+
+// 4. Use in API routes with type safety
+import { db } from '@/lib/db';
+import { users, insertUserSchema } from '@/db/schema';
+
+const newUser = insertUserSchema.parse(requestBody);
+const result = await db.insert(users).values(newUser).returning();
+```
+
+### Multi-Platform Deployment
+
+**This project works with both Vercel and Railway** - choose based on your preference:
+
+#### Vercel Deployment
+```bash
+# Install Vercel CLI globally
+npm i -g vercel
+
+# Login to Vercel
+vercel login
+
+# Link to project
+vercel link
+
+# Pull environment variables from Vercel
+vercel env pull .env.development.local
+
+# Deploy
+vercel --prod
+```
+
+#### Railway Deployment
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+# Note: If installed via npm, you may need to fix permissions:
+chmod +x $(which railway)
+
+# Login to Railway
+railway login
+
+# Link to project
+railway link
+
+# Set environment variables in Railway dashboard
+# Deploy via git push or Railway CLI
+railway up
+```
+
+### Railway MCP Integration
+
+**Important: Railway MCP Server Setup**
+
+The Railway MCP (Model Context Protocol) server enables AI assistants to interact with Railway services directly. To use Railway commands through your AI assistant:
+
+1. **Prerequisites:**
+   - Railway CLI must be installed and executable
+   - You must be logged in via `railway login` before starting your AI session
+   - MCP server configuration in `.mcp.json` (already included in this boilerplate)
+
+2. **Initial Setup:**
+```bash
+# Install Railway CLI globally
+npm install -g @railway/cli
+
+# Fix permissions if installed via npm (common issue)
+chmod +x $(which railway)
+
+# Login to Railway (required before AI assistant can use Railway commands)
+railway login
+```
+
+3. **Available MCP Commands:**
+   - List Railway projects
+   - Check Railway CLI status
+   - Deploy to Railway
+   - Manage environment variables
+
+4. **Troubleshooting:**
+   - **"railway: Permission denied"**: Run `chmod +x $(which railway)` to fix permissions
+   - **"railway: not found"**: Ensure Railway CLI is installed globally
+   - **Authentication errors**: Run `railway login` in your terminal before starting AI session
+   - **MCP connection issues**: Restart your AI assistant after logging into Railway
+
+**Platform Detection:**
+- Vercel: Automatically detected via `VERCEL=1` environment variable
+- Railway: Uses `RAILWAY_DEPLOYMENT=true` for platform-specific optimizations
+- Both platforms work seamlessly with the same codebase
+
+---
+
+## 🗄️ Database Management Standards
+
+### Schema Development Rules
+
+**✅ DO:**
+```typescript
+// Use descriptive table and column names
+export const tasks = pgTable('tasks', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  status: text('status').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Always include Zod validation
+export const insertTaskSchema = createInsertSchema(tasks, {
+  name: z.string().min(1).max(255),
+  status: z.enum(['pending', 'processing', 'completed']),
+});
+
+// Use proper indexes for performance
+}, (table) => ({
+  statusIdx: index('status_idx').on(table.status),
+}));
+```
+
+**❌ DON'T:**
+```typescript
+// Avoid generic names and missing validation
+export const jobs = pgTable('jobs', {
+  id: text('id').primaryKey(),
+  data: json('data'), // Too generic
+  // Missing timestamps, indexes, validation
+});
+```
+
+### Migration Workflow
+
+**Development Environment:**
+```bash
+# Make schema changes in src/db/schema/
+# Push directly to development database
+npm run db:push
+
+# Inspect database structure
+npm run db:studio
+```
+
+**Production Deployment:**
+```bash
+# Generate versioned migration files
+npm run db:generate
+
+# Review generated SQL in drizzle/ directory
+# Deploy to production with proper migrations
+npm run db:migrate
+```
+
+### Database Connection Best Practices
+
+```typescript
+// ✅ Use connection pooling and error handling
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL environment variable is required');
+}
+
+const sql = neon(process.env.DATABASE_URL);
+export const db = drizzle(sql);
+
+// ✅ Always use transactions for multi-table operations
+await db.transaction(async (tx) => {
+  const project = await tx.insert(projects).values(newProject).returning();
+  await tx.insert(researchJobs).values({ projectId: project[0].id });
+});
+```
+
+---
+
+## 🔐 Authentication with Clerk
+
+### Setup & Configuration
+- **Authentication Provider**: Clerk handles all user authentication
+- **Middleware Protection**: `src/middleware.ts` protects all routes (pages + API)
+- **Public Routes**: Only `/sign-in` routes are public
+- **Auth Components**: SignedIn/SignedOut/UserButton integrated into sidebar for persistence
+
+### Implementation Pattern
+```typescript
+// src/middleware.ts - Protects all routes
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)'])
+
+export default clerkMiddleware(async (auth, request) => {
+  if (!isPublicRoute(request)) {
+    await auth.protect(); // Redirects to sign-in if not authenticated
+  }
+})
+```
+
+### Environment Variables Required
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
+```
+
+### Usage in Components
+```typescript
+import { useUser } from "@clerk/nextjs";
+
+function MyComponent() {
+  const { isSignedIn, user } = useUser();
+  
+  if (!isSignedIn) return <div>Please sign in</div>;
+  
+  return <div>Welcome {user.firstName}!</div>;
+}
+```
+
+---
+
+## 🚨 Modern API Error Handling (2025 Standards)
+
+### Required: Structured Error Responses
+
+**✅ DO: Use consistent ApiResponse helper**
+```typescript
+// src/lib/api-response.ts
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+
+export class ApiResponse {
+  static success<T>(data: T, status = 200) {
+    return NextResponse.json({ success: true, data }, { status });
+  }
+
+  static error(message: string, status = 500, details?: unknown) {
+    const error = {
+      success: false,
+      error: message,
+      ...(process.env.NODE_ENV === 'development' && details && { details }),
+      timestamp: new Date().toISOString(),
+    };
+
+    // Next.js 15 handles production logging automatically
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`[API Error ${status}]:`, message, details);
+    }
+
+    return NextResponse.json(error, { status });
+  }
+
+  static validationError(error: z.ZodError) {
+    return this.error('Validation failed', 400, error.issues);
+  }
+}
+```
+
+**✅ DO: Use withErrorHandling wrapper**
+```typescript
+// Modern Next.js 15 API route pattern
+import { ApiResponse, withErrorHandling } from '@/lib/api-response';
+
+async function handlePOST(request: NextRequest) {
+  const body = await request.json();
+  const validatedData = mySchema.parse(body); // Throws ZodError if invalid
+  
+  // Your business logic here
+  const result = await doSomething(validatedData);
+  
+  return ApiResponse.success({
+    message: 'Operation completed successfully',
+    data: result
+  });
+}
+
+// Export with automatic error handling
+export const POST = withErrorHandling(handlePOST);
+```
+
+**❌ DON'T: Manual try/catch everywhere**
+```typescript
+// Old way - avoid this pattern
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    // ... logic
+  } catch (error) {
+    return NextResponse.json({ error: 'Something failed' }, { status: 500 });
+  }
+}
+```
+
+### Error Logging Standards
+
+**Development vs Production:**
+- **Development**: Log full error details, stack traces, request data
+- **Production**: Log errors to monitoring service, return clean messages
+- **Never**: Log sensitive data (API keys, passwords, personal info)
+
+**Required Error Context:**
+```typescript
+console.error(`[${context}] Error occurred:`, {
+  message: error instanceof Error ? error.message : 'Unknown error',
+  stack: error instanceof Error ? error.stack : undefined,
+  requestId: crypto.randomUUID(), // For request tracing
+  timestamp: new Date().toISOString(),
+  userId: session?.userId, // If applicable
+});
+```
+
+### HTTP Status Code Standards
+
+- **200**: Success with data
+- **201**: Resource created successfully  
+- **400**: Bad request (validation errors)
+- **401**: Unauthorized (authentication required)
+- **403**: Forbidden (insufficient permissions)
+- **404**: Resource not found
+- **405**: Method not allowed
+- **409**: Conflict (duplicate resource)
+- **422**: Unprocessable entity (business logic error)
+- **500**: Internal server error
+- **501**: Not implemented (placeholder endpoints)
+- **503**: Service unavailable (database down, etc.)
+
+### Response Format Standards
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "message": "User created successfully",
+    "user": { "id": "123", "email": "user@example.com" }
+  }
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "details": [
+    {
+      "code": "invalid_type",
+      "expected": "string",
+      "received": "undefined",
+      "path": ["email"],
+      "message": "Required"
+    }
+  ],
+  "timestamp": "2025-08-02T17:30:00.000Z"
+}
+```
+
+---
+
+## 🤖 AI Integration Standards (2025)
+
+### Required: Type-Safe AI with Zod Schemas
+
+**✅ DO: Use generateTypedObject with Zod**
+```typescript
+import { generateTypedObject } from '@/lib/openai';
+import { z } from 'zod';
+
+// Define response schema first
+const responseSchema = z.object({
+  audienceSegments: z.array(z.object({
+    name: z.string(),
+    demographics: z.object({
+      ageRange: z.string(),
+      characteristics: z.array(z.string())
+    }),
+    painPoints: z.array(z.string())
+  }))
+});
+
+async function generateAudiencesWithAI(prompt: string) {
+  // Type-safe AI generation - no JSON parsing needed!
+  const response = await generateTypedObject(
+    responseSchema,
+    prompt,
+    'Generate audience segments in the exact format requested.'
+  );
+  
+  return response.audienceSegments; // Fully typed!
+}
+```
+
+**❌ DON'T: Manual JSON parsing**
+```typescript
+// Old way - avoid this
+const response = await makeOpenAIRequest([...]);
+const parsed = JSON.parse(response); // Can fail!
+const segments = parsed.audienceSegments; // Not type-safe
+```
+
+### Benefits of Modern AI Integration:
+- **Zero JSON parsing errors** - AI SDK handles all formats
+- **Full TypeScript support** - Auto-completion and type checking  
+- **Automatic validation** - Zod ensures correct structure
+- **Runtime type safety** - Guaranteed data integrity
+- **No markdown extraction** - Works with any AI response format
+
+---
+
+## 📚 Learning Resources for Senior Development
+
+### Must-Read Concepts
+1. **Clean Code**: Robert C. Martin's principles
+2. **Component Composition**: React patterns and anti-patterns
+3. **TypeScript Advanced Types**: Generics, conditional types, mapped types
+4. **Next.js App Router**: RSC, Server Actions, caching strategies
+5. **Database Design**: PostgreSQL schema patterns, indexing strategies
+6. **Drizzle ORM**: Type-safe database queries and schema management
+7. **Schema Validation**: Zod patterns for runtime type checking
+
+### Code Review Checklist
+Before submitting any PR:
+
+- [ ] **Single Responsibility**: Each function/component does one thing well
+- [ ] **DRY Violations**: No repeated code patterns
+- [ ] **Type Safety**: All props, functions, and variables properly typed
+- [ ] **Error Handling**: Graceful failure handling everywhere
+- [ ] **Performance**: No unnecessary re-renders or expensive operations
+- [ ] **Accessibility**: Proper ARIA labels, semantic HTML
+- [ ] **Testing**: Unit tests for business logic
+- [ ] **Documentation**: Complex logic is commented/documented
+
+### Red Flags That Indicate "Vibe Coding"
+🚨 **These patterns must be eliminated:**
+
+- Functions longer than 50 lines
+- Components with more than 5 props
+- Direct DOM manipulation in React
+- Inline styles instead of Tailwind classes
+- Copy-pasted code blocks
+- Missing error boundaries
+- No loading states for async operations
+- Hardcoded strings instead of constants
+- Poor variable naming (`data`, `info`, `temp`, `x`)
+- **API routes with manual try/catch everywhere**
+- **Inconsistent error response formats**
+- **Missing HTTP status codes or using wrong codes**
+- **Returning raw error messages to client in production**
+- **No request logging or error context**
+- **Manual JSON parsing for AI responses**
+- **AI integrations without Zod schema validation**
+- **Missing type safety in AI response handling**
+
+---
+
+## 🔒 Security & Best Practices
+
+### Environment Variables
+```bash
+# .env.local
+NEXT_PUBLIC_APP_URL=http://localhost:3003
+DATABASE_URL=postgresql://username:password@host/database
+JWT_SECRET=your-super-secret-key
+OPENAI_API_KEY=your-openai-api-key
+```
+
+### API Security
+```typescript
+// Always validate inputs
+import { z } from 'zod';
+
+const CreateUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  const validatedData = CreateUserSchema.parse(body);
+  // ... rest of implementation
+}
+```
+
+---
+
+## 💬 Engineering Communication
+
+### Documentation Standards
+- Comment complex business logic
+- Update README.md with setup instructions
+- Document API endpoints and their contracts
+- Keep `AGENTS.md` updated with project-specific decisions
+
+---
+
+## ⚡ Pro Tips for Next.js 15
+
+```typescript
+// Use App Router features
+import { Suspense } from 'react';
+
+export default function Page() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <DataComponent />
+    </Suspense>
+  );
+}
+
+// Server Components by default
+export default async function ServerComponent() {
+  const data = await fetch('https://api.example.com/data');
+  return <ClientComponent data={data} />;
+}
+
+// Client Components when needed
+'use client';
+export default function ClientComponent({ data }) {
+  const [state, setState] = useState(data);
+  return <InteractiveUI state={state} />;
+}
+```
+
+---
+
+## 🎯 Success Metrics
+
+**You're developing like a senior engineer when:**
+
+✅ Your components are small, focused, and reusable  
+✅ Your code is self-documenting with clear names  
+✅ You handle edge cases and error states  
+✅ You think about performance implications  
+✅ You write code that your future self will thank you for  
+✅ You use TypeScript to catch bugs before they happen  
+✅ You consider the user experience in loading and error states  
+
+---
+
+*Remember: The goal isn't just to make it work—it's to make it work well, maintainably, and professionally. Every line of code is a reflection of your engineering standards.*
+
+---
+
+## 🛠️ Skills & Extensions
+
+AI skills extend what your assistant can do in this repo — database management, ticket creation, code review workflows, and more.
+
+### Installing Skills
+
+```bash
+# Install from skills.sh registry
+npx skills add <skill-name>
+
+# Install Aceable's curated skill pack (includes ticket, review, playwright, wiki, and more)
+npx skills add aceable/acewares
+
+# Browse available skills
+# https://skills.sh/
+```
+
+### Recommended Skills for This Boilerplate
+
+| Skill | What it does |
+|-------|-------------|
+| `aceable/acewares` | Full workspace skill pack (tickets, review, retro, wiki, Playwright) |
+
+Skills install into `.agents/skills/` with a symlink to `.claude/skills/` so Claude Code picks them up automatically in subsequent sessions.
+
+---
+
+*Remember: The goal isn't just to make it work — it's to make it work well, maintainably, and professionally.*

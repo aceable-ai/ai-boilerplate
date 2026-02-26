@@ -4,7 +4,6 @@
     "allow": [
       "Bash(./scripts/check-prerequisites.sh:*)",
       "Bash(./scripts/setup-all.sh:*)",
-      "Bash(./scripts/setup-auth.sh:*)",
       "Bash(./scripts/setup-github-cli.sh:*)",
       "Bash(vercel login:*)"
     ]

@@ -1,3 +1,4 @@
+import { APP_DESCRIPTION, APP_NAME } from '@/lib/config';
 import { MyThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { ClerkProvider } from '@clerk/nextjs';
@@ -10,8 +11,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'PROJECT_NAME',
-  description: 'Endless AI Experimentation',
+  title: APP_NAME,
+  description: APP_DESCRIPTION,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

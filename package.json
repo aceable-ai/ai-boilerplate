@@ -1,11 +1,12 @@
 {
     "name": "ai-boilerplate",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "private": true,
     "engines": {
-        "node": ">=22.0.0"
+        "node": ">=24.0.0"
     },
     "scripts": {
+        "postinstall": "node scripts/link-skills.js",
         "dev": "next dev --turbopack --port 3003",
         "build": "next build",
         "start": "next start",
@@ -17,11 +18,11 @@
         "test:e2e:headed": "playwright test --headed",
         "test:e2e:debug": "playwright test --debug",
         "test:watch": "jest --watch",
-        "pre-commit": "npm run lint && npm run type-check && npm run test",
-        "task-gh-setup": "./scripts/setup-github-cli.sh",
-        "task-check-prerequisites": "./scripts/check-prerequisites.sh",
-        "task-setup-all": "./scripts/setup-all.sh",
-        "task-auth": "./scripts/setup-auth.sh",
+        "lint:all": "next lint && tsc --noEmit",
+        "pre-commit": "npm run lint:all && npm run test",
+        "setup": "./scripts/setup-all.sh",
+        "setup:gh": "./scripts/setup-github-cli.sh",
+        "check": "./scripts/check-prerequisites.sh",
         "db:generate": "drizzle-kit generate",
         "db:migrate": "drizzle-kit migrate",
         "db:push": "drizzle-kit push",
@@ -30,7 +31,7 @@
         "db:branch:list": "neonctl branches list --project-id $NEON_PROJECT_ID",
         "db:branch:delete": "neonctl branches delete --project-id $NEON_PROJECT_ID",
         "db:branch:info": "neonctl branches get --project-id $NEON_PROJECT_ID",
-        "ai:cleanup": "bash scripts/clean-ai-archive.sh"
+        "scratch:clean": "find .scratch -type f -name '*.ts' -o -name '*.js' -o -name '*.tsx' -o -name '*.jsx' | xargs rm -f 2>/dev/null; true"
     },
     "dependencies": {
         "@ai-sdk/openai": "^2.0.94",

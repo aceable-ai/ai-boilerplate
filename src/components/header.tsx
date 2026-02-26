@@ -1,3 +1,4 @@
+import { APP_NAME } from '@/lib/config';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 
@@ -7,10 +8,10 @@ export default function Header() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary">
-            <span className="text-lg font-bold text-primary-foreground">A</span>
+            <span className="text-lg font-bold text-primary-foreground">{APP_NAME[0]}</span>
           </div>
           <Link href="/" className="flex items-center">
-            <span className="text-xl font-bold">PROJECT_NAME</span>
+            <span className="text-xl font-bold">{APP_NAME}</span>
           </Link>
         </div>
       </div>

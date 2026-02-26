@@ -69,3 +69,9 @@ drizzle/schema.ts
 drizzle/relations.ts
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Claude Code local settings (user-specific overrides)
+.claude/settings.local.json
+
+# Skill symlinks — recreated by `npm install` via postinstall (scripts/link-skills.js)
+.claude/skills/
