@@ -3,11 +3,10 @@
 // Runs on every `npm install` via postinstall. Safe to re-run (idempotent).
 // Uses directory junctions on Windows (no admin/Developer Mode required).
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+'use strict';
+const fs = require('fs');
+const path = require('path');
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 const skillsSrc = path.join(root, '.agents', 'skills');
 const skillsDst = path.join(root, '.claude', 'skills');
@@ -23,7 +22,6 @@ let created = 0;
 for (const name of fs.readdirSync(skillsSrc)) {
   const src = path.join(skillsSrc, name);
   const dst = path.join(skillsDst, name);
-  // Relative target (cleaner, works anywhere the repo is cloned)
   const rel = path.relative(path.dirname(dst), src);
 
   if (!fs.statSync(src).isDirectory()) continue;
@@ -35,7 +33,7 @@ for (const name of fs.readdirSync(skillsSrc)) {
     }
     fs.rmSync(dst, { recursive: true });
   } catch {
-    // dst doesn't exist — create it
+    // dst doesn't exist — fall through to create
   }
 
   fs.symlinkSync(isWindows ? src : rel, dst, linkType);
