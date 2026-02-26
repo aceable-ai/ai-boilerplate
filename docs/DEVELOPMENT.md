@@ -42,6 +42,8 @@ npm run db:push
 
 `railway.json` is committed and handles everything — no manual config needed.
 
+New to Railway? → https://docs.railway.com/quick-start
+
 **First-time setup:**
 1. Create a Railway project and connect your GitHub repo
 2. Add these env vars in the Railway dashboard (Settings → Variables):
