@@ -7,6 +7,7 @@
     },
     "scripts": {
         "postinstall": "node scripts/link-skills.js",
+        "prepare": "husky",
         "dev": "next dev --turbopack --port 3003",
         "build": "next build",
         "start": "next start",
@@ -69,6 +70,13 @@
         "eslint-config-next": "15.5.12",
         "tailwindcss": "^4.2.1",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.56.1"
+        "typescript-eslint": "^8.56.1",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.1.2",
+        "secretlint": "^9.3.3",
+        "@secretlint/secretlint-rule-preset-recommend": "^9.3.3"
+    },
+    "lint-staged": {
+        "*.{ts,tsx}": ["eslint --fix"]
     }
 }

@@ -1,0 +1,45 @@
+# Optional CI pipeline — enable by uncommenting the `on:` triggers below.
+# GitHub Actions is billed per-minute for private repos; confirm your team's billing before enabling.
+# To disable: delete this file or comment out the `on:` block.
+
+name: CI
+
+# Uncomment to activate:
+# on:
+#   push:
+#     branches: [main]
+#   pull_request:
+#     branches: [main]
+
+# Placeholder trigger (no-op) so the file is valid YAML when triggers are commented out:
+on:
+  workflow_dispatch:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E tests
+        run: npm run test:e2e

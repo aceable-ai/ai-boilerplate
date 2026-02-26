@@ -49,7 +49,12 @@ npm run check        # validate prerequisites
 npm run setup        # full first-time setup
 npm run setup:gh     # GitHub CLI only
 npm run scratch:clean
+curl localhost:3003/api/health   # health check
 ```
+
+**CI** (opt-in — see `.github/workflows/ci.yml`):
+- Disabled by default; uncomment the `on:` triggers to activate.
+- Steps: lint → type-check → build → E2E. Confirm GitHub Actions billing before enabling on private repos.
 
 ---
 
@@ -74,6 +79,11 @@ src/
 ## Workflow — How We Work
 
 These are non-negotiable behaviors. Follow them in every session.
+
+### Spec-First Development
+- Before writing code: understand the user need, identify edge cases, confirm scope.
+- Ask "what does done look like?" before opening a file.
+- Prefer clarifying questions over assumptions when requirements are ambiguous.
 
 ### Branch & Draft PR First
 - Every piece of work starts with a branch from latest `main` and an immediate draft PR.

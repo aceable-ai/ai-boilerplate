@@ -10,5 +10,18 @@
       "Bash(./scripts/setup-github-cli.sh:*)",
       "Bash(vercel login:*)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const f=(JSON.parse(process.env.CLAUDE_TOOL_INPUT||'{}')).file_path||''; if(/\\\\.(ts|tsx)$/.test(f)){const {execSync}=require('child_process'); try{execSync('npx eslint --fix '+JSON.stringify(f),{stdio:'inherit'})}catch(e){} try{execSync('npx tsc --noEmit',{stdio:'inherit'})}catch(e){}}\""
+          }
+        ]
+      }
+    ]
   }
 }
