@@ -1,62 +1,61 @@
 # AI Boilerplate
 
-A production-ready Next.js starter for vibe coding with Claude, Codex, or Cursor. Includes auth, database, AI, and one-command Railway deployment — all wired up so you can skip setup and build.
+## Start here — paste this into your AI assistant
+
+> Copy the prompt below into **Claude, ChatGPT, Codex, Cursor**, or any AI coding assistant. It will walk you through everything step by step.
+
+```
+You are guiding me through setting up my first project from the Aceable AI Boilerplate.
+I may be completely new to coding.
+
+FIRST, ask me:
+1. Are you on a Mac or Windows? (If Windows, help me figure out if I have WSL installed
+   and recommend it if not — it makes everything easier.)
+2. How comfortable are you with the command line? (beginner / intermediate / advanced)
+
+Then walk me through this process ONE STEP AT A TIME, waiting for me to confirm each
+step works before moving on. Adjust your explanations to my comfort level — beginners
+need terms like "Terminal", "repo", and "environment variable" explained in plain English.
+
+THE GOAL — get all of this done in order:
+1. Open a terminal (help me find the right app for my OS)
+2. Make sure prerequisites are installed: git, Homebrew (Mac/WSL), nvm, Node.js v20+,
+   and GitHub CLI. Check each one and help me install anything missing.
+3. Pick a repo name using format: {team}-{initials}-{project}
+   Teams: eng (Engineering), mkt (Marketing), prd (Product), fin (Finance)
+   Examples: eng-kn-invoice-tool, mkt-jd-landing-pages, prd-al-roadmap-viz
+4. Create the repo:
+   gh repo create aceable-ai/{name} --template aceable-ai/ai-boilerplate --clone --private
+   (If permission error, tell me to ask in #engineering on Slack)
+5. npm install
+6. cp .env.example .env.local — then walk me through getting keys for Neon (database),
+   Clerk (auth), and OpenAI one at a time
+7. npm run db:push
+8. npm run dev — confirm I can open http://localhost:3003
+
+If anything fails, help me debug patiently. Start now.
+```
+
+---
+
+## What you'll get
+
+A production-ready Next.js app with auth, database, AI, and one-command Railway deployment — all wired up so you can skip setup and start building.
 
 ---
 
 ## Prerequisites
 
-Before you start, make sure these are installed:
+These must be installed and working before setup. The prompt above will guide you through checking each one.
 
 | Tool | Check | Install |
 |------|-------|---------|
-| **nvm** | `nvm --version` | `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh \| bash` |
-| **Node.js** | `node --version` | `nvm install && nvm use` |
 | **git** | `git --version` | macOS: `xcode-select --install` |
-| **GitHub CLI** | `gh auth status` | `npm run setup:gh` (after step 2 below) |
+| **Homebrew** | `brew --version` | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
+| **nvm** | `nvm --version` | `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh \| bash` |
+| **Node.js** | `node --version` | `nvm install 20` |
+| **GitHub CLI** | `gh auth status` | `brew install gh` then `gh auth login` |
 | **Railway CLI** | `railway --version` | `npm install -g @railway/cli` |
-
----
-
-## Setup
-
-**1. Create your project from this template**
-
-```bash
-gh repo create my-app-name --template aceable/ai-boilerplate --clone --public
-cd my-app-name
-```
-
-**2. Install dependencies**
-
-```bash
-npm install
-```
-
-**3. Set up environment variables**
-
-```bash
-cp .env.example .env.local
-```
-
-Open `.env.local` and fill in each value. You'll need accounts for:
-- [Neon](https://neon.tech) — free Postgres database
-- [Clerk](https://clerk.com) — free auth
-- [OpenAI](https://platform.openai.com) — API key for AI features
-
-**4. Push the database schema**
-
-```bash
-npm run db:push
-```
-
-**5. Start the dev server**
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3003](http://localhost:3003). You're running.
 
 ---
 
