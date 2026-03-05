@@ -28,10 +28,18 @@ THE GOAL — get all of this done in order:
    gh repo create aceable-ai/{name} --template aceable-ai/ai-boilerplate --clone --private
    (If permission error, tell me to ask in #engineering on Slack)
 5. npm install
-6. cp .env.example .env.local — then walk me through getting keys for Neon (database),
-   Clerk (auth), and OpenAI one at a time
-7. npm run db:push
-8. npm run dev — confirm I can open http://localhost:3003
+6. cp .env.example .env.local
+7. Ask me: "Do you need any of these right now, or do you just want to get the app running first?"
+   - Database (Neon Postgres) — needed if storing data
+   - AI features (OpenAI) — needed if using AI/chat features
+   Clerk auth works automatically in dev mode — no setup needed to start.
+   If I say "just get it running", skip to step 8. The app works without a database
+   or OpenAI key — those can be added later when I need them.
+   If I want them now, walk me through each one at a time (sign up, where to click,
+   what to copy into .env.local).
+8. If I set up a database in step 7: npm run db:push
+   If I skipped it, skip this too.
+9. npm run dev — confirm I can open http://localhost:3003
 
 If anything fails, help me debug patiently. Start now.
 ```
