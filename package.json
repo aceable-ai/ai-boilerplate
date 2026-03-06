@@ -35,11 +35,12 @@
         "scratch:clean": "find .scratch -type f -name '*.ts' -o -name '*.js' -o -name '*.tsx' -o -name '*.jsx' | xargs rm -f 2>/dev/null; true"
     },
     "dependencies": {
-        "@ai-sdk/openai": "^2.0.94",
+        "@ai-sdk/anthropic": "^3.0.58",
+        "@ai-sdk/openai": "^3.0.41",
         "@clerk/nextjs": "^6.38.2",
         "@neondatabase/serverless": "^1.0.2",
         "@radix-ui/themes": "^3.3.0",
-        "ai": "^5.0.139",
+        "ai": "^6.0.116",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "drizzle-kit": "^0.31.9",
@@ -59,6 +60,7 @@
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.4",
         "@playwright/test": "^1.58.2",
+        "@secretlint/secretlint-rule-preset-recommend": "^9.3.3",
         "@tailwindcss/postcss": "^4.2.1",
         "@types/node": "^20.19.34",
         "@types/react": "^19.2.14",
@@ -68,15 +70,16 @@
         "dotenv": "^17.3.1",
         "eslint": "^9.39.3",
         "eslint-config-next": "15.5.12",
-        "tailwindcss": "^4.2.1",
-        "typescript": "^5.9.3",
-        "typescript-eslint": "^8.56.1",
         "husky": "^9.1.7",
         "lint-staged": "^16.1.2",
         "secretlint": "^9.3.3",
-        "@secretlint/secretlint-rule-preset-recommend": "^9.3.3"
+        "tailwindcss": "^4.2.1",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.56.1"
     },
     "lint-staged": {
-        "*.{ts,tsx}": ["eslint --fix"]
+        "*.{ts,tsx}": [
+            "eslint --fix"
+        ]
     }
 }
