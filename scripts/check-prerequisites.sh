@@ -3,6 +3,8 @@
 # Prerequisites Checker
 # Validates dev environment before starting work.
 # Node/NVM setup is handled by AGENT.md + Claude — not this script.
+# Purpose: Validate all development prerequisites before starting work
+>>>>>>> 3dfc831 (chore: generalize template branding and settings)
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
