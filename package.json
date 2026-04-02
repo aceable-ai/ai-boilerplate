@@ -45,11 +45,13 @@
         "drizzle-kit": "^0.31.9",
         "drizzle-orm": "^0.44.7",
         "drizzle-zod": "^0.8.3",
+        "googleapis": "^171.4.0",
         "lucide-react": "^0.575.0",
         "next": "15.5.12",
         "next-themes": "^0.4.6",
         "react": "19.2.4",
         "react-dom": "19.2.4",
+        "resend": "^6.10.0",
         "sonner": "^2.0.7",
         "tailwind-merge": "^3.5.0",
         "uuid": "^11.1.0",
@@ -59,6 +61,7 @@
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.4",
         "@playwright/test": "^1.58.2",
+        "@secretlint/secretlint-rule-preset-recommend": "^9.3.3",
         "@tailwindcss/postcss": "^4.2.1",
         "@types/node": "^20.19.34",
         "@types/react": "^19.2.14",
@@ -68,15 +71,16 @@
         "dotenv": "^17.3.1",
         "eslint": "^9.39.3",
         "eslint-config-next": "15.5.12",
-        "tailwindcss": "^4.2.1",
-        "typescript": "^5.9.3",
-        "typescript-eslint": "^8.56.1",
         "husky": "^9.1.7",
         "lint-staged": "^16.1.2",
         "secretlint": "^9.3.3",
-        "@secretlint/secretlint-rule-preset-recommend": "^9.3.3"
+        "tailwindcss": "^4.2.1",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.56.1"
     },
     "lint-staged": {
-        "*.{ts,tsx}": ["eslint --fix"]
+        "*.{ts,tsx}": [
+            "eslint --fix"
+        ]
     }
 }

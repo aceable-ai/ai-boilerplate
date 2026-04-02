@@ -5,15 +5,15 @@ import Header from '@/components/header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { usePathname } from 'next/navigation';
 
-export default function ClientLayout({ children, isSignedIn }: { children: React.ReactNode; isSignedIn: boolean }) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  // Hide if user not signed in, or on /sign-in
-  const hideLayout = !isSignedIn || pathname.startsWith('/sign-in');
+  // Hide sidebar/header on the login page
+  if (pathname.startsWith('/login')) {
+    return <>{children}</>;
+  }
 
-  return hideLayout ? (
-    children
-  ) : (
+  return (
     <SidebarProvider>
       <Header />
       <AppSidebar />
