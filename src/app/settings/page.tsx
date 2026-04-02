@@ -101,7 +101,7 @@ export default function SettingsPage() {
           ...(prev ?? { connected: true }),
           watchedFolderId: folderId,
           watchActive: true,
-          watchExpiresAt: data.data?.expiresAt,
+          ...(data.data?.expiresAt ? { watchExpiresAt: data.data.expiresAt } : {}),
         }));
       } else {
         setMessage({ type: 'error', text: data.error ?? 'Failed to start watch.' });
