@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 import { meetings } from '@/db/schema';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env['RESEND_API_KEY']);
+function getResend() { return new Resend(process.env['RESEND_API_KEY'] ?? ''); }
 
 export const scoringResultSchema = z.object({
   agenda: z.object({
@@ -359,7 +359,7 @@ async function sendMeetingScoreEmail(payload: EmailPayload) {
 </body>
 </html>`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: process.env['EMAIL_FROM']!,
     to: recipients,
     subject: `Meeting Score: ${meetingTitle} — ${letterGrade} (${overallScore.toFixed(1)}/10)`,

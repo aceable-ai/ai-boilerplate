@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import { getAuthenticatedClient, stopDriveWatch } from '@/lib/google';
 import { db } from '@/lib/db';
 import { googleConnections } from '@/db/schema';
@@ -20,6 +19,3 @@ async function handleDELETE() {
 }
 
 export const DELETE = withErrorHandling(handleDELETE);
-
-// Satisfy Next.js route type requirements
-export { NextResponse };

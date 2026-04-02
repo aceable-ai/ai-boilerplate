@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, XCircle, AlertCircle, RefreshCw, ExternalLink, Unlink, Shield, User } from 'lucide-react';
 
@@ -36,7 +36,7 @@ function StatusBadge({ ok, children }: { ok: boolean; children: React.ReactNode 
   );
 }
 
-export default function SettingsPage() {
+function SettingsContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<WatchStatus | null>(null);
   const [folderId, setFolderId] = useState('');
@@ -380,5 +380,13 @@ export default function SettingsPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense>
+      <SettingsContent />
+    </Suspense>
   );
 }
