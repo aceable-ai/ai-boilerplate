@@ -90,13 +90,7 @@ export function withErrorHandling<T extends unknown[]>(
           return apiError('Database connection failed', 503);
         }
 
-        return apiError(
-          process.env.NODE_ENV === 'development'
-            ? error.message
-            : 'Internal server error',
-          500,
-          process.env.NODE_ENV === 'development' ? error.stack : undefined
-        );
+        return apiError(error.message, 500, error.stack);
       }
 
       return apiError('Unknown error occurred');
