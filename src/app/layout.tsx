@@ -9,6 +9,10 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
   title: APP_NAME,
   description: APP_DESCRIPTION,
 };

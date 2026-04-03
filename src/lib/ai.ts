@@ -2,9 +2,12 @@ import { openai } from '@ai-sdk/openai';
 import { generateText, generateObject } from 'ai';
 import { z } from 'zod';
 
+// Default model — switch provider by changing this line
+export const defaultModel = openai('gpt-4o');
+
 // AI SDK configuration
 export const aiConfig = {
-  model: openai('gpt-4o-2024-11-20'), // Latest GPT-4o model
+  model: defaultModel,
   temperature: 0.8,
   maxTokens: 32000,
 };
@@ -19,23 +22,13 @@ export async function generateWithAI(prompt: string, systemMessage?: string) {
       { role: 'user' as const, content: prompt },
     ],
   });
-  
+
   return text;
 }
 
-// Legacy compatibility - export for existing code
-export { openai } from '@ai-sdk/openai';
-
-// Legacy config for existing code
-export const GENERATION_CONFIG = {
-  model: 'gpt-4o-2024-11-20',
-  temperature: 0.8,
-  maxTokens: 32000,
-};
-
-// Modern 2025 approach: Type-safe object generation with Zod schemas
+// Type-safe object generation with Zod schemas
 export async function generateTypedObject<T>(
-  schema: z.ZodSchema<T>,
+  schema: z.ZodType<T>,
   prompt: string,
   systemMessage?: string
 ): Promise<T> {
@@ -45,20 +38,9 @@ export async function generateTypedObject<T>(
     schema: schema,
     prompt: systemMessage ? `${systemMessage}\n\n${prompt}` : prompt,
   });
-  
+
   return object;
 }
 
-// Legacy makeOpenAIRequest function for compatibility
-export async function makeOpenAIRequest(messages: Array<{ role: string; content: string }>, config = GENERATION_CONFIG) {
-  const { text } = await generateText({
-    model: openai(config.model),
-    temperature: config.temperature,
-    messages: messages.map(msg => ({
-      role: msg.role as 'system' | 'user' | 'assistant',
-      content: msg.content,
-    })),
-  });
-  
-  return text;
-}
+// Re-export provider for direct use
+export { openai } from '@ai-sdk/openai';

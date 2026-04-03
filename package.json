@@ -34,11 +34,12 @@
         "scratch:clean": "find .scratch -type f -name '*.ts' -o -name '*.js' -o -name '*.tsx' -o -name '*.jsx' | xargs rm -f 2>/dev/null; true"
     },
     "dependencies": {
-        "@ai-sdk/openai": "^2.0.94",
+        "@ai-sdk/anthropic": "^3.0.58",
+        "@ai-sdk/openai": "^3.0.41",
         "@clerk/nextjs": "^6.38.2",
         "@neondatabase/serverless": "^1.0.2",
         "@radix-ui/themes": "^3.3.0",
-        "ai": "^5.0.139",
+        "ai": "^6.0.116",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "drizzle-kit": "^0.31.9",
