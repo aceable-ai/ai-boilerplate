@@ -16,6 +16,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   // Prevent Next.js from inferring a parent directory as workspace root
   // when this project lives inside a monorepo or nested git structure.
   outputFileTracingRoot: path.join(__dirname),
