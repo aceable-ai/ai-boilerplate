@@ -53,22 +53,29 @@ interface PastMeeting {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function scoreColor(score: number) {
-  if (score >= 8) return 'text-green-600';
-  if (score >= 6) return 'text-amber-500';
-  return 'text-red-500';
+  if (score >= 8) return 'text-brand-green';
+  if (score >= 6) return 'text-brand-yellow';
+  return 'text-brand-red';
 }
 
 function scoreBgColor(score: number) {
-  if (score >= 8) return 'bg-green-500';
-  if (score >= 6) return 'bg-amber-500';
-  return 'bg-red-500';
+  if (score >= 8) return 'bg-brand-green';
+  if (score >= 6) return 'bg-brand-yellow';
+  return 'bg-brand-red';
+}
+
+function gradeColor(grade: string) {
+  if (grade.startsWith('A')) return 'bg-brand-green';
+  if (grade.startsWith('B')) return 'bg-brand-blue';
+  if (grade.startsWith('C')) return 'bg-brand-yellow';
+  return 'bg-brand-red';
 }
 
 function gradeStyle(grade: string) {
-  if (grade.startsWith('A')) return 'text-green-700 bg-green-50 border-green-300';
-  if (grade.startsWith('B')) return 'text-blue-700 bg-blue-50 border-blue-300';
-  if (grade.startsWith('C')) return 'text-amber-700 bg-amber-50 border-amber-300';
-  return 'text-red-700 bg-red-50 border-red-300';
+  if (grade.startsWith('A')) return 'text-brand-green bg-brand-green-light border-brand-green';
+  if (grade.startsWith('B')) return 'text-brand-blue bg-blue-50 border-brand-blue';
+  if (grade.startsWith('C')) return 'text-brand-yellow bg-brand-yellow-light border-brand-yellow';
+  return 'text-brand-red bg-brand-red-light border-brand-red';
 }
 
 function formatDate(iso: string) {
@@ -316,7 +323,7 @@ export default function MeetingsPage() {
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors capitalize ${
               activeTab === tab
-                ? 'border-blue-600 text-blue-600'
+                ? 'border-brand-teal text-brand-teal'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -415,7 +422,7 @@ export default function MeetingsPage() {
               <button
                 type="submit"
                 disabled={isScoring || !scheduledStart || !scheduledEnd || !transcript.trim()}
-                className="w-full bg-blue-600 text-white rounded-lg py-2.5 text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full bg-brand-teal text-white rounded-lg py-2.5 text-sm font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
               >
                 {isScoring ? (
                   <span className="flex items-center justify-center gap-2">
@@ -445,11 +452,7 @@ export default function MeetingsPage() {
                   <span className="text-3xl font-semibold text-gray-400">/10</span>
                 </div>
                 <div className="mt-4">
-                  <span className={`inline-block text-white text-sm font-bold rounded-full px-5 py-1.5 ${
-                    result.letterGrade.startsWith('A') ? 'bg-green-500' :
-                    result.letterGrade.startsWith('B') ? 'bg-blue-500' :
-                    result.letterGrade.startsWith('C') ? 'bg-amber-500' : 'bg-red-500'
-                  }`}>
+                  <span className={`inline-block text-white text-sm font-bold rounded-full px-5 py-1.5 ${gradeColor(result.letterGrade)}`}>
                     Grade: {result.letterGrade}
                   </span>
                 </div>
