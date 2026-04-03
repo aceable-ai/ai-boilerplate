@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ClipboardList, Clock, Target, CheckSquare, TrendingUp, Download, ChevronDown, ChevronUp, Zap } from 'lucide-react';
+import { TrendingUp, Download, ChevronDown, ChevronUp, Zap } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -82,35 +82,26 @@ function formatDate(iso: string) {
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
 interface ScoreBarProps {
-  icon: React.ReactNode;
   label: string;
-  weight: string;
   score: number;
   maxScore: number;
   feedback: string;
 }
 
-function ScoreBar({ icon, label, weight, score, maxScore, feedback }: ScoreBarProps) {
+function ScoreBar({ label, score, maxScore, feedback }: ScoreBarProps) {
   const pct = (score / maxScore) * 100;
   const normalizedScore = (score / maxScore) * 10;
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
-      <div className="flex items-start justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400">{icon}</span>
-          <div>
-            <div className="text-sm font-semibold text-gray-900">{label}</div>
-            <div className="text-xs text-gray-400">{weight} weight</div>
-          </div>
-        </div>
-        <div className={`text-2xl font-bold ${scoreColor(normalizedScore)}`}>
-          {maxScore === 10 ? score.toFixed(1) : score.toFixed(0)}
-          <span className="text-sm font-normal text-gray-400">/{maxScore}</span>
-        </div>
+    <div className="py-5 border-b border-gray-100 last:border-0">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-base font-bold text-gray-900">{label}</span>
+        <span className={`text-base font-bold ${scoreColor(normalizedScore)}`}>
+          {maxScore === 10 ? score.toFixed(1) : score.toFixed(0)}/10
+        </span>
       </div>
-      <div className="h-2 bg-gray-100 rounded-full mb-3">
+      <div className="h-2.5 bg-gray-100 rounded-full mb-3">
         <div
-          className={`h-2 rounded-full ${scoreBgColor(normalizedScore)}`}
+          className={`h-2.5 rounded-full ${scoreBgColor(normalizedScore)}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -440,88 +431,65 @@ export default function MeetingsPage() {
               </button>
             </form>
           ) : (
-            <div className="space-y-5">
-              {/* Overall score banner */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">
-                      Overall Score
-                    </div>
-                    {result.title && (
-                      <div className="text-base font-semibold text-gray-800 mb-1">{result.title}</div>
-                    )}
-                    {result.meetingType && (
-                      <div className="text-xs text-blue-600 bg-blue-50 border border-blue-100 rounded px-2 py-0.5 inline-block mb-1">{result.meetingType}</div>
-                    )}
-                    <div className="flex items-end gap-2">
-                      <span className={`text-5xl font-bold ${scoreColor(result.overallScore)}`}>
-                        {result.overallScore.toFixed(1)}
-                      </span>
-                      <span className="text-xl text-gray-300 pb-1">/10</span>
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      {formatDate(result.scheduledStart)}
-                    </div>
-                  </div>
-                  <div
-                    className={`text-5xl font-bold border-2 rounded-xl px-5 py-3 ${gradeStyle(result.letterGrade)}`}
-                  >
-                    {result.letterGrade}
-                  </div>
+            <div className="space-y-4">
+              {/* Overall score — centered */}
+              <div className="bg-white rounded-2xl border border-gray-200 px-6 py-8 text-center">
+                {result.title && (
+                  <div className="text-sm font-medium text-gray-500 mb-1">{result.title}</div>
+                )}
+                {result.meetingType && (
+                  <div className="text-xs text-blue-600 bg-blue-50 border border-blue-100 rounded-full px-3 py-0.5 inline-block mb-3">{result.meetingType}</div>
+                )}
+                <div className={`text-7xl font-extrabold leading-none ${scoreColor(result.overallScore)}`}>
+                  {result.overallScore.toFixed(1)}
+                  <span className="text-3xl font-semibold text-gray-400">/10</span>
                 </div>
-                <div className="mt-4 h-3 bg-gray-100 rounded-full">
-                  <div
-                    className={`h-3 rounded-full ${scoreBgColor(result.overallScore)}`}
-                    style={{ width: `${result.overallScore * 10}%` }}
-                  />
+                <div className="mt-4">
+                  <span className={`inline-block text-white text-sm font-bold rounded-full px-5 py-1.5 ${
+                    result.letterGrade.startsWith('A') ? 'bg-green-500' :
+                    result.letterGrade.startsWith('B') ? 'bg-blue-500' :
+                    result.letterGrade.startsWith('C') ? 'bg-amber-500' : 'bg-red-500'
+                  }`}>
+                    Grade: {result.letterGrade}
+                  </span>
                 </div>
+                <div className="text-xs text-gray-400 mt-3">{formatDate(result.scheduledStart)}</div>
               </div>
 
-              {/* Weighted breakdown */}
-              <div>
-                <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Breakdown</h2>
-                <div className="space-y-3">
-                  <ScoreBar
-                    icon={<ClipboardList className="h-4 w-4" />}
-                    label="Agenda Present"
-                    weight="10%"
-                    score={result.scores.agenda.score}
-                    maxScore={10}
-                    feedback={result.scores.agenda.feedback}
-                  />
-                  <ScoreBar
-                    icon={<Clock className="h-4 w-4" />}
-                    label="Started & Ended On Time"
-                    weight="10%"
-                    score={result.scores.timing.score}
-                    maxScore={10}
-                    feedback={result.scores.timing.feedback}
-                  />
-                  <ScoreBar
-                    icon={<Target className="h-4 w-4" />}
-                    label="Impactful Decisions Made"
-                    weight="40%"
-                    score={result.scores.decisions.score}
-                    maxScore={40}
-                    feedback={result.scores.decisions.feedback}
-                  />
-                  <ScoreBar
-                    icon={<CheckSquare className="h-4 w-4" />}
-                    label="Action Items & Follow-Up"
-                    weight="40%"
-                    score={result.scores.actionItems.score}
-                    maxScore={40}
-                    feedback={result.scores.actionItems.feedback}
-                  />
-                </div>
+              {/* Criteria breakdown */}
+              <div className="bg-white rounded-2xl border border-gray-200 px-6 pt-5 pb-1">
+                <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Criteria Breakdown</h2>
+                <ScoreBar
+                  label="Agenda Present"
+                  score={result.scores.agenda.score}
+                  maxScore={10}
+                  feedback={result.scores.agenda.feedback}
+                />
+                <ScoreBar
+                  label="Impactful Decisions Made"
+                  score={result.scores.decisions.score}
+                  maxScore={40}
+                  feedback={result.scores.decisions.feedback}
+                />
+                <ScoreBar
+                  label="Started & Ended On Time"
+                  score={result.scores.timing.score}
+                  maxScore={10}
+                  feedback={result.scores.timing.feedback}
+                />
+                <ScoreBar
+                  label="Action Items & Follow-Up Plan"
+                  score={result.scores.actionItems.score}
+                  maxScore={40}
+                  feedback={result.scores.actionItems.feedback}
+                />
               </div>
 
               {/* Coaching feedback */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp className="h-5 w-5 text-blue-500" />
-                  <h2 className="font-semibold text-gray-900 text-sm">Coaching Feedback</h2>
+              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <TrendingUp className="h-4 w-4 text-blue-500" />
+                  <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Coaching Feedback</h2>
                 </div>
                 <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
                   {result.coachingFeedback}
@@ -530,7 +498,7 @@ export default function MeetingsPage() {
 
               <button
                 onClick={handleNewMeeting}
-                className="w-full border border-gray-200 text-gray-600 rounded-lg py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors"
+                className="w-full border border-gray-200 text-gray-600 rounded-xl py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors"
               >
                 Score Another Meeting
               </button>
