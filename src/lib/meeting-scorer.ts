@@ -179,7 +179,9 @@ ${transcript}
 
 First classify the meeting type, then score each criterion (agenda 1–10, timing 1–10, decisions 1–40, actionItems 1–40). Provide specific, evidence-based feedback quoting or paraphrasing the transcript. Then provide comprehensive coaching feedback.`;
 
+  console.log('[scoreMeeting] calling OpenAI...');
   const result = await generateTypedObject(scoringResultSchema, prompt, SCORING_SYSTEM_PROMPT);
+  console.log('[scoreMeeting] OpenAI done, inserting into DB...');
 
   // Compute weighted score server-side (never trust AI math)
   // Raw scores: agenda/timing out of 10, decisions/actionItems out of 40 → total out of 100 → divide by 10
