@@ -7,20 +7,21 @@ import { Resend } from 'resend';
 function getResend() { return new Resend(process.env['RESEND_API_KEY'] ?? ''); }
 
 export const scoringResultSchema = z.object({
+  meetingType: z.string(),
   agenda: z.object({
-    score: z.number().min(0).max(10),
+    score: z.number().min(1).max(10),
     feedback: z.string(),
   }),
   timing: z.object({
-    score: z.number().min(0).max(10),
+    score: z.number().min(1).max(10),
     feedback: z.string(),
   }),
   decisions: z.object({
-    score: z.number().min(0).max(10),
+    score: z.number().min(1).max(40),
     feedback: z.string(),
   }),
   actionItems: z.object({
-    score: z.number().min(0).max(10),
+    score: z.number().min(1).max(40),
     feedback: z.string(),
   }),
   coachingFeedback: z.string(),
@@ -55,34 +56,66 @@ COMPANY VALUES (reference by name in coaching feedback):
 
 COMPANY FOCUS: This company strongly prioritizes using AI tools and automation to maximize efficiency and eliminate manual work. In coaching feedback, actively suggest specific AI tools, automations, or workflows that would improve meeting effectiveness, follow-up execution, or decision tracking.
 
+MEETING TYPE CLASSIFICATION:
+First, classify the meeting. The default is "strategic/decision-making" (e.g., L10s, CBRs, quarterly reviews). Other types: brainstorm, status update, 1:1, kickoff, retrospective. Return the type in the meetingType field. Apply the full strategic standard unless the content clearly indicates otherwise.
+
 SCORING RUBRIC:
 
-1. Agenda Present (0–10):
-   - 9–10: Explicit, structured agenda shared at the start with clear topics
-   - 7–8: Agenda present but loosely structured or only partially shared
-   - 5–6: General purpose stated but no formal agenda items listed
-   - 3–4: Implicit direction but nothing explicitly stated
-   - 0–2: No agenda whatsoever
+1. Agenda Present (1–10, weight 10%):
+   - 9–10: Clear agenda with distinct topics shared in advance or stated explicitly at the start
+   - 6–8: General purpose or goal stated, but individual topics not enumerated
+   - 3–5: Agenda implied by context but never explicitly stated
+   - 1–2: No agenda, stated purpose, or framing of any kind
+   Note: Do not infer an agenda retroactively from the meeting's content.
 
-2. Started & Ended On Time (0–10):
-   - Look for timestamp cues in the transcript to determine actual start/end.
-   - Start scoring: on time or within 2 min = full credit; 3–5 min late = moderate penalty; 5+ min late = significant penalty.
-   - End scoring: on time or within 5 min = full credit; 5–10 min over = moderate penalty; 10+ min over = significant penalty.
-   - Average start and end scores. If actual times cannot be determined from the transcript, note it and score conservatively (5/10).
+2. Started & Ended On Time (1–10, weight 10%):
+   - 9–10: Started within 2 min of scheduled time AND ended at or before scheduled end
+   - 6–8: Started 3–5 min late OR ran 1–10 min over (not both)
+   - 3–5: Started 5+ min late AND/OR ran 10+ min over
+   - 1–2: Started significantly late AND ran substantially over scheduled time
+   Note: If scheduled times are unavailable, skip this criterion (score 5) and note it. Do not penalize for ending early.
 
-3. Impactful Decisions Made (0–10):
-   - 9–10: Multiple concrete, meaningful decisions with clear outcomes
-   - 7–8: Solid decisions but some lack clarity or impact
-   - 5–6: Some decisions but mostly directional or low-stakes
-   - 3–4: Many discussions but nothing truly decided
-   - 0–2: Pure information sharing; zero decisions or resolutions
+3. Impactful Decisions Made (1–40, weight 40%):
+   Step 1 — Identify candidate decisions using strong indicator language:
+   "We decided to…", "We're moving forward with…", "The plan is…", "We've agreed to…", "We're committing to…", "The decision is…"
+   Disqualify weak language: "We should think about…", "Maybe…", "TBD", "Let's revisit…", discussions that end without resolution.
 
-4. Action Items & Follow-Up Plan (0–10):
-   - 9–10: Every action item has a named owner AND specific deadline; next steps clear
-   - 7–8: Most action items have owners and deadlines; follow-up plan present
-   - 5–6: Action items exist but some lack owners or deadlines
-   - 3–4: Loose mentions of tasks; no accountability structure
-   - 0–2: No action items or follow-up discussed
+   Step 2 — Evaluate each decision on four signals:
+   - Finality: Is it a resolved commitment, or still open?
+   - Scope: Does it affect resources, customers, timelines, budget, headcount, or strategy? (broader = higher weight)
+   - Specificity: Is it concrete enough to act on without clarification? (named owners, dates, dollar amounts = high specificity)
+   - Reversal cost: Would undoing this require meaningful effort? (contracts, external comms, resource allocation = high cost)
+
+   Step 3 — Apply meeting type calibration:
+   - Strategic/decision-making: full standard; missing decisions is a significant gap
+   - Brainstorm: score on directional clarity or prioritized options, not final decisions
+   - Status update / 1:1: score on whether next steps or commitments were surfaced
+   - Kickoff / retrospective: score on key agreements (scope, ownership, process changes)
+
+   Scoring tiers:
+   - 36–40: Multiple decisions with strong finality, meaningful scope, and clear specificity
+   - 26–35: At least one clear decision with finality; scope may be narrow or specificity partial
+   - 14–25: Direction emerged but decisions deferred, qualified, or only process/scheduling decisions made
+   - 5–13: No clear decisions; meeting was exploratory or informational with no commitments
+   - 1–4: No decisions of any kind; discussion unfocused or entirely unresolved
+
+4. Action Items & Follow-Up Plan (1–40, weight 40%):
+   Each action item has three components — score on how completely each is captured:
+   - Owner: named individual or specific team responsible
+   - Task: specific, described action (not vague "follow up on that")
+   - Deadline: explicit date, timeframe, or milestone
+
+   Follow-up plan signals: next meeting scheduled, async check-in planned, stated review point, explicit owner for follow-through.
+   Note: Score on content, not format. "Taylor's going to handle the deck by Friday" is a valid action item.
+
+   Scoring tiers:
+   - 36–40: All action items have named owners, specific tasks, and deadlines; explicit follow-up plan stated
+   - 26–35: Most action items have owners and tasks; deadlines inconsistent; follow-up plan present but vague
+   - 14–25: Some action items identified but owners missing or tasks vague; no follow-up plan
+   - 5–13: Action items mentioned but not assigned or defined; no follow-up structure
+   - 1–4: No action items; meeting ended without next steps
+
+FINAL SCORE: Sum all four raw scores (agenda + timing + decisions + actionItems, max 100), then divide by 10 to get the final score out of 10.
 
 COACHING FEEDBACK GUIDELINES:
 - Write 3–5 paragraphs of direct, specific coaching
@@ -144,16 +177,14 @@ MEETING TRANSCRIPT:
 ${transcript}
 ---
 
-Score each criterion 0–10 and provide specific, evidence-based feedback quoting or paraphrasing the transcript. Then provide comprehensive coaching feedback.`;
+First classify the meeting type, then score each criterion (agenda 1–10, timing 1–10, decisions 1–40, actionItems 1–40). Provide specific, evidence-based feedback quoting or paraphrasing the transcript. Then provide comprehensive coaching feedback.`;
 
   const result = await generateTypedObject(scoringResultSchema, prompt, SCORING_SYSTEM_PROMPT);
 
   // Compute weighted score server-side (never trust AI math)
+  // Raw scores: agenda/timing out of 10, decisions/actionItems out of 40 → total out of 100 → divide by 10
   const overallScore =
-    result.agenda.score * 0.1 +
-    result.timing.score * 0.1 +
-    result.decisions.score * 0.4 +
-    result.actionItems.score * 0.4;
+    (result.agenda.score + result.timing.score + result.decisions.score + result.actionItems.score) / 10;
 
   const letterGrade = getLetterGrade(overallScore);
 
@@ -163,6 +194,7 @@ Score each criterion 0–10 and provide specific, evidence-based feedback quotin
       submitterName: submitterName ?? null,
       title: title ?? null,
       googleCalendarEventId: googleCalendarEventId ?? null,
+      meetingType: result.meetingType,
       scheduledStart,
       scheduledEnd,
       transcript,
@@ -233,8 +265,8 @@ interface EmailPayload {
   coachingFeedback: string;
 }
 
-function scoreBar(score: number): string {
-  const filled = Math.round(score);
+function scoreBar(score: number, max: number): string {
+  const filled = Math.round((score / max) * 10);
   return '█'.repeat(filled) + '░'.repeat(10 - filled);
 }
 
@@ -300,7 +332,7 @@ async function sendMeetingScoreEmail(payload: EmailPayload) {
           <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;">
             <div style="font-size:13px;font-weight:600;color:#374151;">Agenda Present</div>
             <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;">Weight: 10%</div>
-            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(agendaScore)}</div>
+            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(agendaScore, 10)}</div>
             <div style="font-size:12px;color:#4b5563;margin-top:6px;">${agendaFeedback}</div>
           </td>
           <td style="padding:10px 0 10px 16px;border-bottom:1px solid #f3f4f6;text-align:right;white-space:nowrap;vertical-align:top;">
@@ -312,7 +344,7 @@ async function sendMeetingScoreEmail(payload: EmailPayload) {
           <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;">
             <div style="font-size:13px;font-weight:600;color:#374151;">Started &amp; Ended On Time</div>
             <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;">Weight: 10%</div>
-            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(timingScore)}</div>
+            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(timingScore, 10)}</div>
             <div style="font-size:12px;color:#4b5563;margin-top:6px;">${timingFeedback}</div>
           </td>
           <td style="padding:10px 0 10px 16px;border-bottom:1px solid #f3f4f6;text-align:right;white-space:nowrap;vertical-align:top;">
@@ -324,24 +356,24 @@ async function sendMeetingScoreEmail(payload: EmailPayload) {
           <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;">
             <div style="font-size:13px;font-weight:600;color:#374151;">Impactful Decisions Made</div>
             <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;">Weight: 40%</div>
-            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(decisionsScore)}</div>
+            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(decisionsScore, 40)}</div>
             <div style="font-size:12px;color:#4b5563;margin-top:6px;">${decisionsFeedback}</div>
           </td>
           <td style="padding:10px 0 10px 16px;border-bottom:1px solid #f3f4f6;text-align:right;white-space:nowrap;vertical-align:top;">
-            <span style="font-size:20px;font-weight:700;color:${decisionsScore >= 8 ? '#16a34a' : decisionsScore >= 6 ? '#d97706' : '#dc2626'};">${decisionsScore.toFixed(1)}</span>
-            <span style="font-size:12px;color:#9ca3af;">/10</span>
+            <span style="font-size:20px;font-weight:700;color:${decisionsScore >= 32 ? '#16a34a' : decisionsScore >= 24 ? '#d97706' : '#dc2626'};">${decisionsScore.toFixed(0)}</span>
+            <span style="font-size:12px;color:#9ca3af;">/40</span>
           </td>
         </tr>
         <tr>
           <td style="padding:10px 0;">
             <div style="font-size:13px;font-weight:600;color:#374151;">Action Items &amp; Follow-Up</div>
             <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;">Weight: 40%</div>
-            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(actionItemsScore)}</div>
+            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(actionItemsScore, 40)}</div>
             <div style="font-size:12px;color:#4b5563;margin-top:6px;">${actionItemsFeedback}</div>
           </td>
           <td style="padding:10px 0 10px 16px;text-align:right;white-space:nowrap;vertical-align:top;">
-            <span style="font-size:20px;font-weight:700;color:${actionItemsScore >= 8 ? '#16a34a' : actionItemsScore >= 6 ? '#d97706' : '#dc2626'};">${actionItemsScore.toFixed(1)}</span>
-            <span style="font-size:12px;color:#9ca3af;">/10</span>
+            <span style="font-size:20px;font-weight:700;color:${actionItemsScore >= 32 ? '#16a34a' : actionItemsScore >= 24 ? '#d97706' : '#dc2626'};">${actionItemsScore.toFixed(0)}</span>
+            <span style="font-size:12px;color:#9ca3af;">/40</span>
           </td>
         </tr>
       </table>

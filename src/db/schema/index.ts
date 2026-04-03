@@ -22,6 +22,8 @@ export const meetings = pgTable('meetings', {
   actionItemsScore: doublePrecision('action_items_score'),
   actionItemsFeedback: text('action_items_feedback'),
 
+  meetingType: text('meeting_type'),
+
   overallScore: doublePrecision('overall_score'),
   letterGrade: text('letter_grade'),
   coachingFeedback: text('coaching_feedback'),

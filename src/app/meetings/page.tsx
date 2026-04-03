@@ -12,6 +12,7 @@ interface CriterionScore {
 
 interface ScoringResult {
   id: string;
+  meetingType?: string;
   scores: {
     agenda: CriterionScore;
     timing: CriterionScore;
@@ -30,6 +31,7 @@ interface ScoringResult {
 interface PastMeeting {
   id: string;
   title: string | null;
+  meetingType: string | null;
   submitterName: string | null;
   scheduledStart: string;
   scheduledEnd: string;
@@ -84,10 +86,13 @@ interface ScoreBarProps {
   label: string;
   weight: string;
   score: number;
+  maxScore: number;
   feedback: string;
 }
 
-function ScoreBar({ icon, label, weight, score, feedback }: ScoreBarProps) {
+function ScoreBar({ icon, label, weight, score, maxScore, feedback }: ScoreBarProps) {
+  const pct = (score / maxScore) * 100;
+  const normalizedScore = (score / maxScore) * 10;
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5">
       <div className="flex items-start justify-between mb-2">
@@ -98,15 +103,15 @@ function ScoreBar({ icon, label, weight, score, feedback }: ScoreBarProps) {
             <div className="text-xs text-gray-400">{weight} weight</div>
           </div>
         </div>
-        <div className={`text-2xl font-bold ${scoreColor(score)}`}>
-          {score.toFixed(1)}
-          <span className="text-sm font-normal text-gray-400">/10</span>
+        <div className={`text-2xl font-bold ${scoreColor(normalizedScore)}`}>
+          {maxScore === 10 ? score.toFixed(1) : score.toFixed(0)}
+          <span className="text-sm font-normal text-gray-400">/{maxScore}</span>
         </div>
       </div>
       <div className="h-2 bg-gray-100 rounded-full mb-3">
         <div
-          className={`h-2 rounded-full ${scoreBgColor(score)}`}
-          style={{ width: `${score * 10}%` }}
+          className={`h-2 rounded-full ${scoreBgColor(normalizedScore)}`}
+          style={{ width: `${pct}%` }}
         />
       </div>
       <p className="text-sm text-gray-600 leading-relaxed">{feedback}</p>
@@ -174,19 +179,19 @@ function ExpandableMeetingRow({ meeting }: ExpandableMeetingRowProps) {
         <div className="px-5 pb-5 space-y-4 bg-gray-50">
           <div className="grid grid-cols-2 gap-3 pt-2">
             {[
-              { label: 'Agenda', weight: '10%', score: meeting.agendaScore, feedback: meeting.agendaFeedback },
-              { label: 'On Time', weight: '10%', score: meeting.timingScore, feedback: meeting.timingFeedback },
-              { label: 'Decisions', weight: '40%', score: meeting.decisionsScore, feedback: meeting.decisionsFeedback },
-              { label: 'Action Items', weight: '40%', score: meeting.actionItemsScore, feedback: meeting.actionItemsFeedback },
-            ].map(({ label, weight, score: s, feedback }) =>
+              { label: 'Agenda', weight: '10%', score: meeting.agendaScore, max: 10, feedback: meeting.agendaFeedback },
+              { label: 'On Time', weight: '10%', score: meeting.timingScore, max: 10, feedback: meeting.timingFeedback },
+              { label: 'Decisions', weight: '40%', score: meeting.decisionsScore, max: 40, feedback: meeting.decisionsFeedback },
+              { label: 'Action Items', weight: '40%', score: meeting.actionItemsScore, max: 40, feedback: meeting.actionItemsFeedback },
+            ].map(({ label, weight, score: s, max, feedback }) =>
               s !== null ? (
                 <div key={label} className="bg-white rounded-lg border border-gray-200 p-3">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-semibold text-gray-600">{label}</span>
-                    <span className={`text-sm font-bold ${scoreColor(s)}`}>{s.toFixed(1)}/10</span>
+                    <span className={`text-sm font-bold ${scoreColor((s / max) * 10)}`}>{max === 10 ? s.toFixed(1) : s.toFixed(0)}/{max}</span>
                   </div>
                   <div className="h-1.5 bg-gray-100 rounded-full mb-2">
-                    <div className={`h-1.5 rounded-full ${scoreBgColor(s)}`} style={{ width: `${s * 10}%` }} />
+                    <div className={`h-1.5 rounded-full ${scoreBgColor((s / max) * 10)}`} style={{ width: `${(s / max) * 100}%` }} />
                   </div>
                   <p className="text-xs text-gray-500 leading-relaxed">{feedback}</p>
                   <p className="text-xs text-gray-400 mt-1">{weight} weight</p>
@@ -446,6 +451,9 @@ export default function MeetingsPage() {
                     {result.title && (
                       <div className="text-base font-semibold text-gray-800 mb-1">{result.title}</div>
                     )}
+                    {result.meetingType && (
+                      <div className="text-xs text-blue-600 bg-blue-50 border border-blue-100 rounded px-2 py-0.5 inline-block mb-1">{result.meetingType}</div>
+                    )}
                     <div className="flex items-end gap-2">
                       <span className={`text-5xl font-bold ${scoreColor(result.overallScore)}`}>
                         {result.overallScore.toFixed(1)}
@@ -479,6 +487,7 @@ export default function MeetingsPage() {
                     label="Agenda Present"
                     weight="10%"
                     score={result.scores.agenda.score}
+                    maxScore={10}
                     feedback={result.scores.agenda.feedback}
                   />
                   <ScoreBar
@@ -486,6 +495,7 @@ export default function MeetingsPage() {
                     label="Started & Ended On Time"
                     weight="10%"
                     score={result.scores.timing.score}
+                    maxScore={10}
                     feedback={result.scores.timing.feedback}
                   />
                   <ScoreBar
@@ -493,6 +503,7 @@ export default function MeetingsPage() {
                     label="Impactful Decisions Made"
                     weight="40%"
                     score={result.scores.decisions.score}
+                    maxScore={40}
                     feedback={result.scores.decisions.feedback}
                   />
                   <ScoreBar
@@ -500,6 +511,7 @@ export default function MeetingsPage() {
                     label="Action Items & Follow-Up"
                     weight="40%"
                     score={result.scores.actionItems.score}
+                    maxScore={40}
                     feedback={result.scores.actionItems.feedback}
                   />
                 </div>
