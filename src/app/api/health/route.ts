@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 export function GET() {
   return NextResponse.json({
     status: 'ok',
+    version: 'v2-debug',
     timestamp: new Date().toISOString(),
     env: {
       DATABASE_URL: !!process.env['DATABASE_URL'],
