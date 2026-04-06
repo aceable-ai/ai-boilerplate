@@ -90,7 +90,9 @@ export function withErrorHandling<T extends unknown[]>(
           return apiError('Database connection failed', 503);
         }
 
-        return apiError(error.message, 500, error.stack);
+        const cause = (error as Error & { cause?: unknown }).cause;
+        const detail = cause instanceof Error ? cause.message : error.stack;
+        return apiError(error.message, 500, detail);
       }
 
       return apiError('Unknown error occurred');
