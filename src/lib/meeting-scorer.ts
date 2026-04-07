@@ -68,6 +68,14 @@ SCORING RUBRIC:
    - 1–2: No agenda, stated purpose, or framing of any kind
    Note: Do not infer an agenda retroactively from the meeting's content.
 
+   STRUCTURED MEETING FORMATS — automatically score 10/10 for agenda if the meeting title or transcript clearly indicates one of these formats, as they have a fixed, well-known agenda by design:
+   - L10 / Level 10 (EOS): segue, scorecard, rocks, headlines, to-do review, IDS issues, conclude
+   - Quarterly Review / QBR: fixed quarterly business review structure
+   - Sprint Review / Sprint Retrospective: fixed Scrum ceremony structure
+   - Standup / Daily Scrum: fixed three-question format
+
+   For all other meetings, credit requires explicit agenda language in the transcript. Strong signals (9–10): "Today's agenda is…", "We'll cover…", "First we'll discuss… then…", "Agenda item 1…", numbered or bulleted topics read aloud at the start. Moderate signals (6–8): "The goal of today's meeting is…", "We're here to talk about X and Y", stated meeting purpose with 2+ topics. Weak signals (3–5): topic implied by meeting title only, no explicit framing in transcript.
+
 2. Started & Ended On Time (1–10, weight 10%):
    - 9–10: Started within 2 min of scheduled time AND ended at or before scheduled end
    - 6–8: Started 3–5 min late OR ran 1–10 min over (not both)
