@@ -380,7 +380,7 @@ async function sendMeetingScoreEmail(payload: EmailPayload) {
         </tr>
         <tr>
           <td style="padding:10px 0;">
-            <div style="font-size:13px;font-weight:600;color:#374151;">Action Items &amp; Follow-Up</div>
+            <div style="font-size:13px;font-weight:600;color:#374151;">Action Items</div>
             <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;">Weight: 40%</div>
             <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(actionItemsScore, 40)}</div>
             <div style="font-size:12px;color:#4b5563;margin-top:6px;">${actionItemsFeedback}</div>

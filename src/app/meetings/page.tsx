@@ -173,17 +173,17 @@ function ExpandableMeetingRow({ meeting }: ExpandableMeetingRowProps) {
             {[
               { label: 'Agenda', weight: '10%', score: meeting.agendaScore, max: 10, feedback: meeting.agendaFeedback },
               { label: 'On Time', weight: '10%', score: meeting.timingScore, max: 10, feedback: meeting.timingFeedback },
-              { label: 'Decisions', weight: '40%', score: meeting.decisionsScore, max: 40, feedback: meeting.decisionsFeedback },
-              { label: 'Action Items', weight: '40%', score: meeting.actionItemsScore, max: 40, feedback: meeting.actionItemsFeedback },
+              { label: 'Decisions', weight: '40%', score: meeting.decisionsScore, max: 10, feedback: meeting.decisionsFeedback },
+              { label: 'Action Items', weight: '40%', score: meeting.actionItemsScore, max: 10, feedback: meeting.actionItemsFeedback },
             ].map(({ label, weight, score: s, max, feedback }) =>
               s !== null ? (
                 <div key={label} className="bg-white rounded-lg border border-gray-200 p-3">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-semibold text-gray-600">{label}</span>
-                    <span className={`text-sm font-bold ${scoreColor((s / max) * 10)}`}>{max === 10 ? s.toFixed(1) : s.toFixed(0)}/{max}</span>
+                    <span className={`text-sm font-bold ${scoreColor(s)}`}>{s.toFixed(1)}/10</span>
                   </div>
                   <div className="h-1.5 bg-gray-100 rounded-full mb-2">
-                    <div className={`h-1.5 rounded-full ${scoreBgColor((s / max) * 10)}`} style={{ width: `${(s / max) * 100}%` }} />
+                    <div className={`h-1.5 rounded-full ${scoreBgColor(s)}`} style={{ width: `${(s / max) * 100}%` }} />
                   </div>
                   <p className="text-xs text-gray-500 leading-relaxed">{feedback}</p>
                   <p className="text-xs text-gray-400 mt-1">{weight} weight</p>
@@ -461,7 +461,7 @@ export default function MeetingsPage() {
                 <CategoryResult
                   label="Impactful Decisions Made"
                   score={result.scores.decisions.score}
-                  maxScore={40}
+                  maxScore={10}
                   feedback={result.scores.decisions.feedback}
                 />
                 <CategoryResult
@@ -471,9 +471,9 @@ export default function MeetingsPage() {
                   feedback={result.scores.timing.feedback}
                 />
                 <CategoryResult
-                  label="Action Items & Follow-Up Plan"
+                  label="Action Items"
                   score={result.scores.actionItems.score}
-                  maxScore={40}
+                  maxScore={10}
                   feedback={result.scores.actionItems.feedback}
                 />
               </div>
