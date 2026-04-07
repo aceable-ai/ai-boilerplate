@@ -9,6 +9,7 @@ async function handleGET(_request: NextRequest) {
     .select({
       id: meetings.id,
       title: meetings.title,
+      meetingType: meetings.meetingType,
       submitterName: meetings.submitterName,
       scheduledStart: meetings.scheduledStart,
       scheduledEnd: meetings.scheduledEnd,
@@ -24,6 +25,7 @@ async function handleGET(_request: NextRequest) {
       actionItemsScore: meetings.actionItemsScore,
       actionItemsFeedback: meetings.actionItemsFeedback,
       coachingFeedback: meetings.coachingFeedback,
+      excluded: meetings.excluded,
       createdAt: meetings.createdAt,
     })
     .from(meetings)

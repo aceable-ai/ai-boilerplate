@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { TrendingUp, Download, ChevronDown, ChevronUp, Zap } from 'lucide-react';
+import { TrendingUp, Download, ChevronDown, ChevronUp, Zap, EyeOff, Eye } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -46,6 +46,7 @@ interface PastMeeting {
   actionItemsScore: number | null;
   actionItemsFeedback: string | null;
   coachingFeedback: string | null;
+  excluded: boolean;
   source: string;
   createdAt: string;
 }
@@ -113,15 +114,26 @@ function CategoryResult({ label, score, maxScore, feedback }: CategoryResultProp
 
 interface ExpandableMeetingRowProps {
   meeting: PastMeeting;
+  onToggleExcluded: (id: string, excluded: boolean) => void;
 }
 
-function ExpandableMeetingRow({ meeting }: ExpandableMeetingRowProps) {
+function ExpandableMeetingRow({ meeting, onToggleExcluded }: ExpandableMeetingRowProps) {
   const [expanded, setExpanded] = useState(false);
   const score = meeting.overallScore ?? 0;
   const grade = meeting.letterGrade ?? '—';
 
+  function handleToggleExcluded(e: React.MouseEvent) {
+    e.stopPropagation();
+    const next = !meeting.excluded;
+    fetch(`/api/meetings/${meeting.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ excluded: next }),
+    }).then(() => onToggleExcluded(meeting.id, next)).catch(() => undefined);
+  }
+
   return (
-    <div className="border-b border-gray-100 last:border-0">
+    <div className={`border-b border-gray-100 last:border-0 ${meeting.excluded ? 'opacity-40' : ''}`}>
       <button
         onClick={() => setExpanded((v) => !v)}
         className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors text-left"
@@ -132,6 +144,12 @@ function ExpandableMeetingRow({ meeting }: ExpandableMeetingRowProps) {
           </div>
           <div className="text-xs text-gray-400 mt-0.5 flex items-center gap-2">
             <span>{formatDate(meeting.scheduledStart)}</span>
+            {meeting.meetingType && (
+              <>
+                <span>·</span>
+                <span>{meeting.meetingType}</span>
+              </>
+            )}
             {meeting.submitterName && (
               <>
                 <span>·</span>
@@ -159,6 +177,13 @@ function ExpandableMeetingRow({ meeting }: ExpandableMeetingRowProps) {
               {grade}
             </span>
           )}
+          <button
+            onClick={handleToggleExcluded}
+            title={meeting.excluded ? 'Include in stats' : 'Exclude from stats'}
+            className="text-gray-300 hover:text-gray-500 transition-colors"
+          >
+            {meeting.excluded ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
           {expanded ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />
           ) : (
@@ -229,6 +254,7 @@ export default function MeetingsPage() {
   // History
   const [pastMeetings, setPastMeetings] = useState<PastMeeting[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [typeFilter, setTypeFilter] = useState<string>('All');
 
   const fetchHistory = useCallback(() => {
     setLoadingHistory(true);
@@ -280,6 +306,12 @@ export default function MeetingsPage() {
     }
   }
 
+  function handleToggleExcluded(id: string, excluded: boolean) {
+    setPastMeetings((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, excluded } : m))
+    );
+  }
+
   function handleNewMeeting() {
     setResult(null);
     setTitle('');
@@ -300,6 +332,7 @@ export default function MeetingsPage() {
             AI-powered effectiveness scoring based on agenda, decisions, timing, and follow-through.
           </p>
         </div>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
           href="/api/meetings/export"
           className="flex items-center gap-1.5 text-sm text-brand-teal border border-brand-teal-mid rounded-full px-4 py-2 hover:bg-brand-teal-light transition-colors font-semibold"
@@ -511,62 +544,63 @@ export default function MeetingsPage() {
             </div>
           ) : (
             <>
-              {/* Summary stats */}
-              {pastMeetings.length >= 2 && (
-                <div className="grid grid-cols-4 gap-3 mb-6">
-                  {[
-                    {
-                      label: 'Avg Score',
-                      value: (
-                        pastMeetings.reduce((s, m) => s + (m.overallScore ?? 0), 0) /
-                        pastMeetings.length
-                      ).toFixed(1),
-                      suffix: '/10',
-                    },
-                    {
-                      label: 'Avg Agenda',
-                      value: (
-                        pastMeetings.reduce((s, m) => s + (m.agendaScore ?? 0), 0) /
-                        pastMeetings.length
-                      ).toFixed(1),
-                      suffix: '/10',
-                    },
-                    {
-                      label: 'Avg Decisions',
-                      value: (
-                        pastMeetings.reduce((s, m) => s + (m.decisionsScore ?? 0), 0) /
-                        pastMeetings.length
-                      ).toFixed(1),
-                      suffix: '/10',
-                    },
-                    {
-                      label: 'Avg Action Items',
-                      value: (
-                        pastMeetings.reduce((s, m) => s + (m.actionItemsScore ?? 0), 0) /
-                        pastMeetings.length
-                      ).toFixed(1),
-                      suffix: '/10',
-                    },
-                  ].map(({ label, value, suffix }) => (
-                    <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                      <div className="text-xs text-gray-400 mb-1">{label}</div>
-                      <div className="text-xl font-bold text-gray-900">
-                        {value}
-                        <span className="text-xs font-normal text-gray-400">{suffix}</span>
+              {/* Type filter pills */}
+              {(() => {
+                const types = ['All', ...Array.from(new Set(pastMeetings.map((m) => m.meetingType).filter(Boolean))) as string[]];
+                return types.length > 2 ? (
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {types.map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setTypeFilter(t)}
+                        className={`text-xs font-semibold rounded-full px-3 py-1.5 transition-colors ${
+                          typeFilter === t
+                            ? 'bg-brand-pink text-white'
+                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                ) : null;
+              })()}
+
+              {/* Summary stats — only included meetings, respects filter */}
+              {(() => {
+                const statsBase = pastMeetings.filter(
+                  (m) => !m.excluded && (typeFilter === 'All' || m.meetingType === typeFilter)
+                );
+                return statsBase.length >= 2 ? (
+                  <div className="grid grid-cols-4 gap-3 mb-6">
+                    {[
+                      { label: 'Avg Score', value: (statsBase.reduce((s, m) => s + (m.overallScore ?? 0), 0) / statsBase.length).toFixed(1) },
+                      { label: 'Avg Agenda', value: (statsBase.reduce((s, m) => s + (m.agendaScore ?? 0), 0) / statsBase.length).toFixed(1) },
+                      { label: 'Avg Decisions', value: (statsBase.reduce((s, m) => s + (m.decisionsScore ?? 0), 0) / statsBase.length).toFixed(1) },
+                      { label: 'Avg Action Items', value: (statsBase.reduce((s, m) => s + (m.actionItemsScore ?? 0), 0) / statsBase.length).toFixed(1) },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                        <div className="text-xs text-gray-400 mb-1">{label}</div>
+                        <div className="text-xl font-bold text-gray-900">
+                          {value}<span className="text-xs font-normal text-gray-400">/10</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                ) : null;
+              })()}
 
               {/* Meeting list */}
               <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-                {pastMeetings.map((m) => (
-                  <ExpandableMeetingRow key={m.id} meeting={m} />
-                ))}
+                {pastMeetings
+                  .filter((m) => typeFilter === 'All' || m.meetingType === typeFilter)
+                  .map((m) => (
+                    <ExpandableMeetingRow key={m.id} meeting={m} onToggleExcluded={handleToggleExcluded} />
+                  ))}
               </div>
 
               <div className="flex justify-end mt-4">
+                {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                 <a
                   href="/api/meetings/export"
                   className="flex items-center gap-1.5 text-sm text-brand-teal border border-brand-teal-mid rounded-full px-4 py-2 hover:bg-brand-teal-light transition-colors font-semibold"

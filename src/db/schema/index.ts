@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, doublePrecision } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, doublePrecision, boolean } from 'drizzle-orm/pg-core';
 
 export const meetings = pgTable('meetings', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -27,6 +27,8 @@ export const meetings = pgTable('meetings', {
   overallScore: doublePrecision('overall_score'),
   letterGrade: text('letter_grade'),
   coachingFeedback: text('coaching_feedback'),
+
+  excluded: boolean('excluded').notNull().default(false),
 
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
