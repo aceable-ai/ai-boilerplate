@@ -17,11 +17,11 @@ export const scoringResultSchema = z.object({
     feedback: z.string(),
   }),
   decisions: z.object({
-    score: z.number().min(1).max(40),
+    score: z.number().min(1).max(10),
     feedback: z.string(),
   }),
   actionItems: z.object({
-    score: z.number().min(1).max(40),
+    score: z.number().min(1).max(10),
     feedback: z.string(),
   }),
   coachingFeedback: z.string(),
@@ -83,7 +83,7 @@ SCORING RUBRIC:
    - 1–2: Started significantly late AND ran substantially over scheduled time
    Note: If scheduled times are unavailable, skip this criterion (score 5) and note it. Do not penalize for ending early.
 
-3. Impactful Decisions Made (1–40, weight 40%):
+3. Impactful Decisions Made (1–10, weight 40%):
    Step 1 — Identify candidate decisions using strong indicator language:
    "We decided to…", "We're moving forward with…", "The plan is…", "We've agreed to…", "We're committing to…", "The decision is…"
    Disqualify weak language: "We should think about…", "Maybe…", "TBD", "Let's revisit…", discussions that end without resolution.
@@ -100,30 +100,33 @@ SCORING RUBRIC:
    - Status update / 1:1: score on whether next steps or commitments were surfaced
    - Kickoff / retrospective: score on key agreements (scope, ownership, process changes)
 
-   Scoring tiers:
-   - 36–40: Multiple decisions with strong finality, meaningful scope, and clear specificity
-   - 26–35: At least one clear decision with finality; scope may be narrow or specificity partial
-   - 14–25: Direction emerged but decisions deferred, qualified, or only process/scheduling decisions made
-   - 5–13: No clear decisions; meeting was exploratory or informational with no commitments
-   - 1–4: No decisions of any kind; discussion unfocused or entirely unresolved
+   L10 / EOS MEETINGS: Use IDS-aware scoring. Each issue that goes through Identify → Discuss → Solve and reaches a clear resolution counts as a decision. "Solve" outcomes with named owners and next steps = strong decisions. Issues "moved to parking lot" or left as "to discuss offline" = not decisions. A well-run L10 that solves 3–5 issues cleanly should score 8–10.
 
-4. Action Items & Follow-Up Plan (1–40, weight 40%):
+   Scoring tiers (1–10):
+   - 9–10: Multiple decisions with strong finality, meaningful scope, and clear specificity
+   - 7–8: At least one clear decision with finality; scope may be narrow or specificity partial
+   - 4–6: Direction emerged but decisions deferred, qualified, or only process/scheduling decisions made
+   - 2–3: No clear decisions; meeting was exploratory or informational with no commitments
+   - 1: No decisions of any kind; discussion unfocused or entirely unresolved
+
+4. Action Items (1–10, weight 40%):
    Each action item has three components — score on how completely each is captured:
    - Owner: named individual or specific team responsible
    - Task: specific, described action (not vague "follow up on that")
    - Deadline: explicit date, timeframe, or milestone
 
-   Follow-up plan signals: next meeting scheduled, async check-in planned, stated review point, explicit owner for follow-through.
    Note: Score on content, not format. "Taylor's going to handle the deck by Friday" is a valid action item.
 
-   Scoring tiers:
-   - 36–40: All action items have named owners, specific tasks, and deadlines; explicit follow-up plan stated
-   - 26–35: Most action items have owners and tasks; deadlines inconsistent; follow-up plan present but vague
-   - 14–25: Some action items identified but owners missing or tasks vague; no follow-up plan
-   - 5–13: Action items mentioned but not assigned or defined; no follow-up structure
-   - 1–4: No action items; meeting ended without next steps
+   L10 / EOS MEETINGS: To-dos created during the meeting are explicit action items — treat each one as well-formed if it has an owner and task (L10s implicitly assume a 7-day deadline). A meeting that creates 5+ clear to-dos with owners should score 8–10.
 
-FINAL SCORE: Sum all four raw scores (agenda + timing + decisions + actionItems, max 100), then divide by 10 to get the final score out of 10.
+   Scoring tiers (1–10):
+   - 9–10: All action items have named owners, specific tasks, and deadlines
+   - 7–8: Most have owners and tasks; deadlines inconsistent
+   - 4–6: Some action items identified but owners missing or tasks vague
+   - 2–3: Action items mentioned but not assigned or defined
+   - 1: No action items at all
+
+FINAL SCORE: All four criteria scored 1–10. Weights: agenda 10%, timing 10%, decisions 40%, action items 40%. Overall = (agenda × 0.1) + (timing × 0.1) + (decisions × 0.4) + (actionItems × 0.4).
 
 COACHING FEEDBACK GUIDELINES:
 - Write 3–5 paragraphs of direct, specific coaching
@@ -190,9 +193,12 @@ First classify the meeting type, then score each criterion (agenda 1–10, timin
   const result = await generateTypedObject(scoringResultSchema, prompt, SCORING_SYSTEM_PROMPT);
 
   // Compute weighted score server-side (never trust AI math)
-  // Raw scores: agenda/timing out of 10, decisions/actionItems out of 40 → total out of 100 → divide by 10
+  // All criteria scored 1–10. Weights: agenda 10%, timing 10%, decisions 40%, actionItems 40%
   const overallScore =
-    (result.agenda.score + result.timing.score + result.decisions.score + result.actionItems.score) / 10;
+    (result.agenda.score * 0.1) +
+    (result.timing.score * 0.1) +
+    (result.decisions.score * 0.4) +
+    (result.actionItems.score * 0.4);
 
   const letterGrade = getLetterGrade(overallScore);
 
