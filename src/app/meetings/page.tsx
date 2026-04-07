@@ -88,29 +88,23 @@ function formatDate(iso: string) {
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
-interface ScoreBarProps {
+interface CategoryResultProps {
   label: string;
   score: number;
   maxScore: number;
   feedback: string;
 }
 
-function ScoreBar({ label, score, maxScore, feedback }: ScoreBarProps) {
-  const pct = (score / maxScore) * 100;
+function CategoryResult({ label, score, maxScore, feedback }: CategoryResultProps) {
   const normalizedScore = (score / maxScore) * 10;
   return (
-    <div className="py-5 border-b border-gray-100 last:border-0">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-base font-bold text-gray-900">{label}</span>
-        <span className={`text-base font-bold ${scoreColor(normalizedScore)}`}>
-          {maxScore === 10 ? score.toFixed(1) : score.toFixed(0)}/10
+    <div className="bg-white rounded-2xl border border-gray-200 p-5">
+      <div className="flex items-baseline justify-between mb-3">
+        <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">{label}</span>
+        <span className={`text-2xl font-extrabold ${scoreColor(normalizedScore)}`}>
+          {normalizedScore.toFixed(1)}
+          <span className="text-sm font-semibold text-gray-400">/10</span>
         </span>
-      </div>
-      <div className="h-2.5 bg-gray-100 rounded-full mb-3">
-        <div
-          className={`h-2.5 rounded-full ${scoreBgColor(normalizedScore)}`}
-          style={{ width: `${pct}%` }}
-        />
       </div>
       <p className="text-sm text-gray-600 leading-relaxed">{feedback}</p>
     </div>
@@ -201,7 +195,7 @@ function ExpandableMeetingRow({ meeting }: ExpandableMeetingRowProps) {
           {meeting.coachingFeedback && (
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <div className="flex items-center gap-1.5 mb-2">
-                <TrendingUp className="h-4 w-4 text-blue-500" />
+                <TrendingUp className="h-4 w-4 text-brand-teal" />
                 <span className="text-xs font-semibold text-gray-700">Coaching Feedback</span>
               </div>
               <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">{meeting.coachingFeedback}</p>
@@ -301,14 +295,14 @@ export default function MeetingsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Meeting Scorer</h1>
+          <h1 className="text-3xl font-extrabold text-gray-900">Meeting Scorer</h1>
           <p className="text-sm text-gray-500 mt-1">
             AI-powered effectiveness scoring based on agenda, decisions, timing, and follow-through.
           </p>
         </div>
         <a
           href="/api/meetings/export"
-          className="flex items-center gap-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-brand-teal border border-brand-teal-mid rounded-full px-4 py-2 hover:bg-brand-teal-light transition-colors font-semibold"
         >
           <Download className="h-4 w-4" />
           Export CSV
@@ -321,9 +315,9 @@ export default function MeetingsPage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors capitalize ${
+            className={`px-4 py-2.5 text-sm font-bold border-b-2 transition-colors capitalize ${
               activeTab === tab
-                ? 'border-brand-teal text-brand-teal'
+                ? 'border-brand-pink text-brand-pink'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -339,7 +333,7 @@ export default function MeetingsPage() {
             <form onSubmit={(e) => { void handleSubmit(e); }} className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Meeting Title <span className="text-gray-400 font-normal">(optional)</span>
                 </label>
                 <input
@@ -347,49 +341,49 @@ export default function MeetingsPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Weekly Product Sync"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-pink"
                 />
               </div>
 
               {/* Scheduled times */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Scheduled Start</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Scheduled Start</label>
                   <input
                     type="datetime-local"
                     value={scheduledStart}
                     onChange={(e) => setScheduledStart(e.target.value)}
                     required
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-pink"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Scheduled End</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Scheduled End</label>
                   <input
                     type="datetime-local"
                     value={scheduledEnd}
                     onChange={(e) => setScheduledEnd(e.target.value)}
                     required
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-pink"
                   />
                 </div>
               </div>
 
               {/* Google Calendar note */}
-              <div className="rounded-lg bg-blue-50 border border-blue-100 px-4 py-3 text-sm text-blue-700">
+              <div className="rounded-lg bg-brand-teal-light border border-brand-teal-mid px-4 py-3 text-sm text-brand-teal">
                 <strong>Coming soon:</strong> Connect Google Calendar to auto-populate start/end times from your calendar events.
               </div>
 
               {/* Transcript */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Meeting Transcript</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Meeting Transcript</label>
                 <textarea
                   value={transcript}
                   onChange={(e) => setTranscript(e.target.value)}
                   required
                   rows={14}
                   placeholder="Paste your full meeting transcript here..."
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none font-mono"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-pink resize-none font-mono"
                 />
                 <div className="text-xs text-gray-400 mt-1 text-right">
                   {transcript.length.toLocaleString()} characters
@@ -398,7 +392,7 @@ export default function MeetingsPage() {
 
               {/* Participant emails */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
                   Participant Emails <span className="text-gray-400 font-normal">(optional — score will be emailed to these addresses)</span>
                 </label>
                 <input
@@ -406,15 +400,12 @@ export default function MeetingsPage() {
                   value={participantEmails}
                   onChange={(e) => setParticipantEmails(e.target.value)}
                   placeholder="alice@company.com, bob@company.com"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-pink"
                 />
               </div>
 
-              <div>
-              </div>
-
               {error && (
-                <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                <div className="rounded-lg bg-brand-red-light border border-brand-red px-4 py-3 text-sm text-brand-red">
                   {error}
                 </div>
               )}
@@ -422,7 +413,7 @@ export default function MeetingsPage() {
               <button
                 type="submit"
                 disabled={isScoring || !scheduledStart || !scheduledEnd || !transcript.trim()}
-                className="w-full bg-brand-teal text-white rounded-lg py-2.5 text-sm font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                className="w-full bg-brand-pink text-white rounded-full py-3 text-sm font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
               >
                 {isScoring ? (
                   <span className="flex items-center justify-center gap-2">
@@ -460,27 +451,26 @@ export default function MeetingsPage() {
               </div>
 
               {/* Criteria breakdown */}
-              <div className="bg-white rounded-2xl border border-gray-200 px-6 pt-5 pb-1">
-                <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Criteria Breakdown</h2>
-                <ScoreBar
+              <div className="space-y-3">
+                <CategoryResult
                   label="Agenda Present"
                   score={result.scores.agenda.score}
                   maxScore={10}
                   feedback={result.scores.agenda.feedback}
                 />
-                <ScoreBar
+                <CategoryResult
                   label="Impactful Decisions Made"
                   score={result.scores.decisions.score}
                   maxScore={40}
                   feedback={result.scores.decisions.feedback}
                 />
-                <ScoreBar
+                <CategoryResult
                   label="Started & Ended On Time"
                   score={result.scores.timing.score}
                   maxScore={10}
                   feedback={result.scores.timing.feedback}
                 />
-                <ScoreBar
+                <CategoryResult
                   label="Action Items & Follow-Up Plan"
                   score={result.scores.actionItems.score}
                   maxScore={40}
@@ -491,7 +481,7 @@ export default function MeetingsPage() {
               {/* Coaching feedback */}
               <div className="bg-white rounded-2xl border border-gray-200 p-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="h-4 w-4 text-blue-500" />
+                  <TrendingUp className="h-4 w-4 text-brand-teal" />
                   <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Coaching Feedback</h2>
                 </div>
                 <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
@@ -501,7 +491,7 @@ export default function MeetingsPage() {
 
               <button
                 onClick={handleNewMeeting}
-                className="w-full border border-gray-200 text-gray-600 rounded-xl py-2.5 text-sm font-medium hover:bg-gray-50 transition-colors"
+                className="w-full border-2 border-brand-pink text-brand-pink rounded-full py-3 text-sm font-bold hover:bg-brand-pink-light transition-colors"
               >
                 Score Another Meeting
               </button>
@@ -579,7 +569,7 @@ export default function MeetingsPage() {
               <div className="flex justify-end mt-4">
                 <a
                   href="/api/meetings/export"
-                  className="flex items-center gap-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-1.5 text-sm text-brand-teal border border-brand-teal-mid rounded-full px-4 py-2 hover:bg-brand-teal-light transition-colors font-semibold"
                 >
                   <Download className="h-4 w-4" />
                   Export all as CSV

@@ -1,12 +1,11 @@
 'use client';
 
 import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from '@/components/ui/sidebar';
-import { Home, ClipboardList, Settings } from 'lucide-react';
+import { ClipboardList, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Home', icon: Home },
   { href: '/meetings', label: 'Meeting Scorer', icon: ClipboardList },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
