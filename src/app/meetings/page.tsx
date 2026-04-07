@@ -254,7 +254,6 @@ export default function MeetingsPage() {
   // History
   const [pastMeetings, setPastMeetings] = useState<PastMeeting[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [typeFilter, setTypeFilter] = useState<string>('All');
 
   const fetchHistory = useCallback(() => {
     setLoadingHistory(true);
@@ -544,33 +543,9 @@ export default function MeetingsPage() {
             </div>
           ) : (
             <>
-              {/* Type filter pills */}
+              {/* Summary stats — only included meetings */}
               {(() => {
-                const types = ['All', ...Array.from(new Set(pastMeetings.map((m) => m.meetingType).filter(Boolean))) as string[]];
-                return types.length > 2 ? (
-                  <div className="flex flex-wrap gap-2 mb-5">
-                    {types.map((t) => (
-                      <button
-                        key={t}
-                        onClick={() => setTypeFilter(t)}
-                        className={`text-xs font-semibold rounded-full px-3 py-1.5 transition-colors ${
-                          typeFilter === t
-                            ? 'bg-brand-pink text-white'
-                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                        }`}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                  </div>
-                ) : null;
-              })()}
-
-              {/* Summary stats — only included meetings, respects filter */}
-              {(() => {
-                const statsBase = pastMeetings.filter(
-                  (m) => !m.excluded && (typeFilter === 'All' || m.meetingType === typeFilter)
-                );
+                const statsBase = pastMeetings.filter((m) => !m.excluded);
                 return statsBase.length >= 2 ? (
                   <div className="grid grid-cols-4 gap-3 mb-6">
                     {[
@@ -592,11 +567,9 @@ export default function MeetingsPage() {
 
               {/* Meeting list */}
               <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-                {pastMeetings
-                  .filter((m) => typeFilter === 'All' || m.meetingType === typeFilter)
-                  .map((m) => (
-                    <ExpandableMeetingRow key={m.id} meeting={m} onToggleExcluded={handleToggleExcluded} />
-                  ))}
+                {pastMeetings.map((m) => (
+                  <ExpandableMeetingRow key={m.id} meeting={m} onToggleExcluded={handleToggleExcluded} />
+                ))}
               </div>
 
               <div className="flex justify-end mt-4">
