@@ -43,7 +43,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "drizzle-kit": "^0.31.9",
-        "drizzle-orm": "^0.44.7",
+        "drizzle-orm": "^0.45.2",
         "drizzle-zod": "^0.8.3",
         "googleapis": "^171.4.0",
         "lucide-react": "^0.575.0",
