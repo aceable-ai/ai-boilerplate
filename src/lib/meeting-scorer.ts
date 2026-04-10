@@ -285,10 +285,10 @@ function scoreBar(score: number, max: number): string {
 }
 
 function gradeColor(grade: string): string {
-  if (grade.startsWith('A')) return '#16a34a';
-  if (grade.startsWith('B')) return '#2563eb';
-  if (grade.startsWith('C')) return '#d97706';
-  return '#dc2626';
+  if (grade.startsWith('A')) return '#229A76';
+  if (grade.startsWith('B')) return '#12BDCD';
+  if (grade.startsWith('C')) return '#D98D00';
+  return '#D42F42';
 }
 
 async function sendMeetingScoreEmail(payload: EmailPayload) {
@@ -321,87 +321,133 @@ async function sendMeetingScoreEmail(payload: EmailPayload) {
   const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;margin:0;padding:24px;">
-  <div style="max-width:600px;margin:0 auto;">
+<body style="font-family:'Museo Sans','Gill Sans MT','Trebuchet MS',Arial,sans-serif;background:#F0F4F6;margin:0;padding:0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F0F4F6;padding:32px 16px;">
+    <tr><td>
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;">
 
-    <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:32px;margin-bottom:16px;">
-      <div style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Meeting Score</div>
-      <div style="font-size:22px;font-weight:700;color:#111827;margin-bottom:4px;">${meetingTitle}</div>
-      <div style="font-size:14px;color:#6b7280;margin-bottom:24px;">${dateStr}</div>
-
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:48px;font-weight:800;color:${color};line-height:1;">${overallScore.toFixed(1)}</div>
-          <div style="font-size:14px;color:#9ca3af;">out of 10</div>
-        </div>
-        <div style="font-size:52px;font-weight:800;color:${color};border:2px solid ${color};border-radius:12px;padding:8px 20px;line-height:1;">${letterGrade}</div>
-      </div>
-    </div>
-
-    <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:24px;margin-bottom:16px;">
-      <div style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px;">Scorecard</div>
-
-      <table style="width:100%;border-collapse:collapse;">
+        <!-- Header -->
         <tr>
-          <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;">
-            <div style="font-size:13px;font-weight:600;color:#374151;">Agenda Present</div>
-            <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;">Weight: 10%</div>
-            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(agendaScore, 10)}</div>
-            <div style="font-size:12px;color:#4b5563;margin-top:6px;">${agendaFeedback}</div>
-          </td>
-          <td style="padding:10px 0 10px 16px;border-bottom:1px solid #f3f4f6;text-align:right;white-space:nowrap;vertical-align:top;">
-            <span style="font-size:20px;font-weight:700;color:${agendaScore >= 8 ? '#16a34a' : agendaScore >= 6 ? '#d97706' : '#dc2626'};">${agendaScore.toFixed(1)}</span>
-            <span style="font-size:12px;color:#9ca3af;">/10</span>
+          <td style="background:#12BDCD;border-radius:12px 12px 0 0;padding:24px 32px;">
+            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Ace Debrief</div>
+            <div style="font-size:20px;font-weight:700;color:#ffffff;">Meeting Score Report</div>
           </td>
         </tr>
+
+        <!-- Meeting title + overall score -->
         <tr>
-          <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;">
-            <div style="font-size:13px;font-weight:600;color:#374151;">Started &amp; Ended On Time</div>
-            <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;">Weight: 10%</div>
-            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(timingScore, 10)}</div>
-            <div style="font-size:12px;color:#4b5563;margin-top:6px;">${timingFeedback}</div>
-          </td>
-          <td style="padding:10px 0 10px 16px;border-bottom:1px solid #f3f4f6;text-align:right;white-space:nowrap;vertical-align:top;">
-            <span style="font-size:20px;font-weight:700;color:${timingScore >= 8 ? '#16a34a' : timingScore >= 6 ? '#d97706' : '#dc2626'};">${timingScore.toFixed(1)}</span>
-            <span style="font-size:12px;color:#9ca3af;">/10</span>
+          <td style="background:#ffffff;padding:32px;">
+            <div style="font-size:22px;font-weight:700;color:#21333F;margin-bottom:4px;">${meetingTitle}</div>
+            <div style="font-size:14px;color:#526D7F;margin-bottom:28px;">${dateStr}</div>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="vertical-align:bottom;">
+                  <div style="font-size:56px;font-weight:900;color:${color};line-height:1;">${overallScore.toFixed(1)}</div>
+                  <div style="font-size:13px;color:#93A7B4;margin-top:2px;">out of 10</div>
+                </td>
+                <td style="text-align:right;vertical-align:middle;">
+                  <div style="font-size:52px;font-weight:900;color:${color};border:3px solid ${color};border-radius:12px;padding:8px 24px;line-height:1;display:inline-block;">${letterGrade}</div>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
+
+        <!-- Divider -->
+        <tr><td style="background:#ffffff;padding:0 32px;"><div style="height:1px;background:#ECECEC;"></div></td></tr>
+
+        <!-- Scorecard -->
         <tr>
-          <td style="padding:10px 0;border-bottom:1px solid #f3f4f6;">
-            <div style="font-size:13px;font-weight:600;color:#374151;">Impactful Decisions Made</div>
-            <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;">Weight: 40%</div>
-            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(decisionsScore, 40)}</div>
-            <div style="font-size:12px;color:#4b5563;margin-top:6px;">${decisionsFeedback}</div>
-          </td>
-          <td style="padding:10px 0 10px 16px;border-bottom:1px solid #f3f4f6;text-align:right;white-space:nowrap;vertical-align:top;">
-            <span style="font-size:20px;font-weight:700;color:${decisionsScore >= 32 ? '#16a34a' : decisionsScore >= 24 ? '#d97706' : '#dc2626'};">${decisionsScore.toFixed(0)}</span>
-            <span style="font-size:12px;color:#9ca3af;">/40</span>
+          <td style="background:#ffffff;padding:24px 32px 32px;">
+            <div style="font-size:11px;font-weight:700;color:#93A7B4;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:24px;">Scorecard</div>
+
+            <!-- Agenda -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:4px;">
+              <tr>
+                <td>
+                  <div style="font-size:14px;font-weight:700;color:#21333F;">Agenda Present</div>
+                  <div style="font-size:11px;color:#93A7B4;margin-bottom:6px;">Weight: 10%</div>
+                  <div style="font-family:monospace;font-size:13px;color:#12BDCD;">${scoreBar(agendaScore, 10)}</div>
+                  <div style="font-size:13px;color:#526D7F;margin-top:8px;line-height:1.6;">${agendaFeedback}</div>
+                </td>
+                <td style="text-align:right;vertical-align:top;padding-left:16px;white-space:nowrap;">
+                  <span style="font-size:22px;font-weight:700;color:${agendaScore >= 8 ? '#229A76' : agendaScore >= 6 ? '#D98D00' : '#D42F42'};">${agendaScore.toFixed(1)}</span>
+                  <span style="font-size:12px;color:#93A7B4;">/10</span>
+                </td>
+              </tr>
+            </table>
+            <div style="height:1px;background:#F0F4F6;margin:20px 0;"></div>
+
+            <!-- Timing -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:4px;">
+              <tr>
+                <td>
+                  <div style="font-size:14px;font-weight:700;color:#21333F;">Started &amp; Ended On Time</div>
+                  <div style="font-size:11px;color:#93A7B4;margin-bottom:6px;">Weight: 10%</div>
+                  <div style="font-family:monospace;font-size:13px;color:#12BDCD;">${scoreBar(timingScore, 10)}</div>
+                  <div style="font-size:13px;color:#526D7F;margin-top:8px;line-height:1.6;">${timingFeedback}</div>
+                </td>
+                <td style="text-align:right;vertical-align:top;padding-left:16px;white-space:nowrap;">
+                  <span style="font-size:22px;font-weight:700;color:${timingScore >= 8 ? '#229A76' : timingScore >= 6 ? '#D98D00' : '#D42F42'};">${timingScore.toFixed(1)}</span>
+                  <span style="font-size:12px;color:#93A7B4;">/10</span>
+                </td>
+              </tr>
+            </table>
+            <div style="height:1px;background:#F0F4F6;margin:20px 0;"></div>
+
+            <!-- Decisions -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:4px;">
+              <tr>
+                <td>
+                  <div style="font-size:14px;font-weight:700;color:#21333F;">Impactful Decisions Made</div>
+                  <div style="font-size:11px;color:#93A7B4;margin-bottom:6px;">Weight: 40%</div>
+                  <div style="font-family:monospace;font-size:13px;color:#12BDCD;">${scoreBar(decisionsScore, 10)}</div>
+                  <div style="font-size:13px;color:#526D7F;margin-top:8px;line-height:1.6;">${decisionsFeedback}</div>
+                </td>
+                <td style="text-align:right;vertical-align:top;padding-left:16px;white-space:nowrap;">
+                  <span style="font-size:22px;font-weight:700;color:${decisionsScore >= 8 ? '#229A76' : decisionsScore >= 6 ? '#D98D00' : '#D42F42'};">${decisionsScore.toFixed(1)}</span>
+                  <span style="font-size:12px;color:#93A7B4;">/10</span>
+                </td>
+              </tr>
+            </table>
+            <div style="height:1px;background:#F0F4F6;margin:20px 0;"></div>
+
+            <!-- Action Items -->
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <div style="font-size:14px;font-weight:700;color:#21333F;">Action Items</div>
+                  <div style="font-size:11px;color:#93A7B4;margin-bottom:6px;">Weight: 40%</div>
+                  <div style="font-family:monospace;font-size:13px;color:#12BDCD;">${scoreBar(actionItemsScore, 10)}</div>
+                  <div style="font-size:13px;color:#526D7F;margin-top:8px;line-height:1.6;">${actionItemsFeedback}</div>
+                </td>
+                <td style="text-align:right;vertical-align:top;padding-left:16px;white-space:nowrap;">
+                  <span style="font-size:22px;font-weight:700;color:${actionItemsScore >= 8 ? '#229A76' : actionItemsScore >= 6 ? '#D98D00' : '#D42F42'};">${actionItemsScore.toFixed(1)}</span>
+                  <span style="font-size:12px;color:#93A7B4;">/10</span>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
+
+        <!-- Coaching Feedback -->
         <tr>
-          <td style="padding:10px 0;">
-            <div style="font-size:13px;font-weight:600;color:#374151;">Action Items</div>
-            <div style="font-size:11px;color:#9ca3af;margin-bottom:4px;">Weight: 40%</div>
-            <div style="font-family:monospace;font-size:12px;color:#6b7280;">${scoreBar(actionItemsScore, 40)}</div>
-            <div style="font-size:12px;color:#4b5563;margin-top:6px;">${actionItemsFeedback}</div>
-          </td>
-          <td style="padding:10px 0 10px 16px;text-align:right;white-space:nowrap;vertical-align:top;">
-            <span style="font-size:20px;font-weight:700;color:${actionItemsScore >= 32 ? '#16a34a' : actionItemsScore >= 24 ? '#d97706' : '#dc2626'};">${actionItemsScore.toFixed(0)}</span>
-            <span style="font-size:12px;color:#9ca3af;">/40</span>
+          <td style="background:#21333F;padding:32px;border-radius:0 0 12px 12px;">
+            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">Coaching Feedback</div>
+            <div style="font-size:14px;color:rgba(255,255,255,0.88);line-height:1.8;white-space:pre-wrap;">${coachingFeedback}</div>
           </td>
         </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="text-align:center;padding:20px 0;">
+            <div style="font-size:12px;color:#93A7B4;">Powered by <span style="color:#12BDCD;font-weight:700;">Ace Debrief</span></div>
+          </td>
+        </tr>
+
       </table>
-    </div>
-
-    <div style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:24px;margin-bottom:16px;">
-      <div style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Coaching Feedback</div>
-      <div style="font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap;">${coachingFeedback}</div>
-    </div>
-
-    <div style="text-align:center;font-size:12px;color:#9ca3af;padding:16px 0;">
-      Powered by Ace Debrief
-    </div>
-  </div>
+    </td></tr>
+  </table>
 </body>
 </html>`;
 
