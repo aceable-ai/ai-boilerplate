@@ -80,6 +80,8 @@ export function withErrorHandling<T extends unknown[]>(
       }
 
       if (error instanceof Error) {
+        console.error('[API Error]:', error.message, error.stack);
+
         if (error.message.includes('not yet implemented')) {
           return apiError('Feature not implemented', 501, error.message);
         }
@@ -88,13 +90,9 @@ export function withErrorHandling<T extends unknown[]>(
           return apiError('Database connection failed', 503);
         }
 
-        return apiError(
-          process.env.NODE_ENV === 'development'
-            ? error.message
-            : 'Internal server error',
-          500,
-          process.env.NODE_ENV === 'development' ? error.stack : undefined
-        );
+        const cause = (error as Error & { cause?: unknown }).cause;
+        const detail = cause instanceof Error ? cause.message : error.stack;
+        return apiError(error.message, 500, detail);
       }
 
       return apiError('Unknown error occurred');

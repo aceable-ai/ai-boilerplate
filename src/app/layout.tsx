@@ -1,13 +1,12 @@
 import { APP_DESCRIPTION, APP_NAME } from '@/lib/config';
 import { MyThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
-import { ClerkProvider } from '@clerk/nextjs';
-import { Inter } from 'next/font/google';
+import { Nunito_Sans } from 'next/font/google';
 import type React from 'react';
 import ClientLayout from './client-layout';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const nunitoSans = Nunito_Sans({ subsets: ['latin'], variable: '--font-nunito-sans' });
 
 export const metadata = {
   robots: {
@@ -20,15 +19,13 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className={inter.className}>
-          <MyThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <ClientLayout>{children}</ClientLayout>
-            <Toaster />
-          </MyThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${nunitoSans.variable} font-sans`}>
+        <MyThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ClientLayout>{children}</ClientLayout>
+          <Toaster />
+        </MyThemeProvider>
+      </body>
+    </html>
   );
 }

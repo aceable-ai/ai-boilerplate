@@ -1,9 +1,9 @@
-import { anthropic } from '@ai-sdk/anthropic';
+import { openai } from '@ai-sdk/openai';
 import { generateText, generateObject } from 'ai';
 import { z } from 'zod';
 
 // Default model — switch provider by changing this line
-export const defaultModel = anthropic('claude-sonnet-4-20250514');
+export const defaultModel = openai('gpt-4o');
 
 // AI SDK configuration
 export const aiConfig = {
@@ -28,7 +28,7 @@ export async function generateWithAI(prompt: string, systemMessage?: string) {
 
 // Type-safe object generation with Zod schemas
 export async function generateTypedObject<T>(
-  schema: z.ZodSchema<T>,
+  schema: z.ZodType<T>,
   prompt: string,
   systemMessage?: string
 ): Promise<T> {
@@ -42,6 +42,5 @@ export async function generateTypedObject<T>(
   return object;
 }
 
-// Re-export providers for direct use
-export { anthropic } from '@ai-sdk/anthropic';
+// Re-export provider for direct use
 export { openai } from '@ai-sdk/openai';
