@@ -80,6 +80,8 @@ export function withErrorHandling<T extends unknown[]>(
       }
 
       if (error instanceof Error) {
+        console.error('[API Error]:', error.message, error.stack);
+
         if (error.message.includes('not yet implemented')) {
           return apiError('Feature not implemented', 501, error.message);
         }
