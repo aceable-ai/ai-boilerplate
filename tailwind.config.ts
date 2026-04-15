@@ -15,6 +15,9 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['var(--font-nunito-sans)', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -48,6 +51,21 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        brand: {
+          teal:   '#12BDCD',
+          pink:   '#FF3072',
+          green:  '#2ce1ab',
+          red:    '#ec5164',
+          yellow: '#fcb11a',
+          blue:   '#2689ca',
+          black:  '#21333F',
+          'teal-light': '#e7fafa',
+          'teal-mid':   '#88dee6',
+          'green-light': '#e9fcf6',
+          'pink-light':  '#ffeaf0',
+          'red-light':   '#ffeaea',
+          'yellow-light': '#fff8ee',
         },
       },
       borderRadius: {

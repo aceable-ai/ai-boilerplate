@@ -8,11 +8,12 @@ import { usePathname } from 'next/navigation';
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const hideLayout = pathname.startsWith('/sign-in');
+  // Hide sidebar/header on the login page
+  if (pathname.startsWith('/login')) {
+    return <>{children}</>;
+  }
 
-  return hideLayout ? (
-    children
-  ) : (
+  return (
     <SidebarProvider>
       <Header />
       <AppSidebar />

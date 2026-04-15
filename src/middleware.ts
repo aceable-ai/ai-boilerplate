@@ -1,27 +1,48 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextRequest, NextResponse } from 'next/server';
+import { SESSION_COOKIE } from '@/lib/simple-auth';
 
-const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/api/health'])
+// Routes that don't require login
+const PUBLIC_PREFIXES = [
+  '/login',
+  '/api/auth/',
+  '/api/google/drive-webhook',
+  '/api/meetings/webhook',
+  '/api/cron/',
+];
 
-export default clerkMiddleware(async (auth, request) => {
-  console.log(`[MIDDLEWARE] ${request.method} ${request.nextUrl.pathname} - isPublic: ${isPublicRoute(request)}`);
-  
-  // Bypass authentication for Playwright testing (development only)
-  if (process.env.NODE_ENV === 'development' && process.env['PLAYWRIGHT_TESTING'] === 'true') {
-    console.log(`[MIDDLEWARE] Bypassing auth for Playwright testing: ${request.nextUrl.pathname}`);
-    return;
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Allow public routes through
+  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return NextResponse.next();
   }
-  
-  if (!isPublicRoute(request)) {
-    console.log(`[MIDDLEWARE] Protecting route: ${request.nextUrl.pathname}`);
-    await auth.protect();
+
+  // Check session cookie
+  const session = request.cookies.get(SESSION_COOKIE);
+  if (!session?.value) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
-})
+
+  // Verify the token value matches what the server expects.
+  // We compute it here using the same logic as simple-auth.ts,
+  // but using only Web-compatible APIs since middleware runs on the Edge.
+  const password = process.env['APP_PASSWORD'] ?? '';
+  const secret = process.env['APP_SECRET'] ?? 'ace-debrief-secret';
+  const expected = btoa(`${password}:${secret}`);
+
+  if (session.value !== expected) {
+    const response = NextResponse.redirect(new URL('/login', request.url));
+    response.cookies.delete(SESSION_COOKIE);
+    return response;
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
     '/(api|trpc)(.*)',
   ],
-}
+};
