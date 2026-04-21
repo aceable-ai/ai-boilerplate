@@ -1,5 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
+// Add new webhook or health-check paths to the public list.
+// Do NOT widen this matcher to '(.*)' to sidestep a broken build — that
+// disables auth for the whole app. If `next build` fails with
+// "Missing publishableKey", see docs/DEVELOPMENT.md#build-time-vs-runtime.
 const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/api/health'])
 
 export default clerkMiddleware(async (auth, request) => {

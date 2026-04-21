@@ -1,0 +1,49 @@
+# Always-on build smoke test. Complements the opt-in ci.yml (lint + type-check + e2e).
+# GitHub Actions is billed per-minute for private repos; this workflow runs on every
+# PR and every push to main. If that's more than your team wants to spend, trim the
+# triggers below or replace this file with the extended ci.yml flow.
+
+name: Build
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Least-privilege token — this workflow only needs to read the repo to build it.
+permissions:
+  contents: read
+
+# Cancel in-flight runs when a newer commit lands on the same ref. Without this,
+# a rapid sequence of pushes spawns N parallel builds; with it, only the latest
+# one runs to completion.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: next build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          # Placeholder Clerk key. Shape-valid (decodes to
+          # "clerk-test-placeholder.clerk.accounts.dev$") so @clerk/nextjs's
+          # build-time validator accepts it. Only the SHAPE is our contract
+          # here — if a future Clerk SDK upgrade tightens validation (e.g.,
+          # requires the instance domain to resolve, or rejects unregistered
+          # keys), this workflow will fail loudly and you'll need to
+          # regenerate a placeholder from a real test instance and redact.
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmstdGVzdC1wbGFjZWhvbGRlci5jbGVyay5hY2NvdW50cy5kZXYk
+          CLERK_SECRET_KEY: sk_test_placeholder-for-ci-build-only

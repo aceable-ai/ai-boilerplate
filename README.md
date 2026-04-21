@@ -19,8 +19,9 @@ need terms like "Terminal", "repo", and "environment variable" explained in plai
 
 THE GOAL — get all of this done in order:
 1. Open a terminal (help me find the right app for my OS)
-2. Make sure prerequisites are installed: git, Homebrew (Mac/WSL), nvm, Node.js v20+,
-   and GitHub CLI. Check each one and help me install anything missing.
+2. Make sure prerequisites are installed: git, Homebrew (Mac/WSL), nvm, Node.js v24+
+   (match `.nvmrc` — `nvm install` with no argument picks it up), and GitHub CLI.
+   Check each one and help me install anything missing.
 3. Pick a repo name using format: {team}-{initials}-{project}
    Teams: eng (Engineering), mkt (Marketing), prd (Product), fin (Finance)
    Examples: eng-kn-invoice-tool, mkt-jd-landing-pages, prd-al-roadmap-viz
@@ -29,17 +30,43 @@ THE GOAL — get all of this done in order:
    (If permission error, tell me to ask in #engineering on Slack)
 5. npm install
 6. cp .env.example .env.local
-7. Ask me: "Do you need any of these right now, or do you just want to get the app running first?"
+7. Set up Clerk auth — required to load any page. Walk me through it:
+   - Go to https://dashboard.clerk.com, sign in, click "Create application"
+   - Pick sign-in methods (email and Google SSO are reasonable defaults)
+   - On the API Keys page, copy the Publishable Key (starts with `pk_test_`)
+     and the Secret Key (starts with `sk_test_`, click the eye icon to reveal)
+   - Paste both into .env.local as NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+     and CLERK_SECRET_KEY
+   Explain that without these, every page redirects to a broken sign-in
+   handshake — `npm run dev` will serve, but no page will actually load.
+8. Ask me: "Do you need either of these right now, or do you just want
+   to get the app running first?"
    - Database (Neon Postgres) — needed if storing data
    - AI features (OpenAI) — needed if using AI/chat features
-   Clerk auth works automatically in dev mode — no setup needed to start.
-   If I say "just get it running", skip to step 8. The app works without a database
-   or OpenAI key — those can be added later when I need them.
-   If I want them now, walk me through each one at a time (sign up, where to click,
-   what to copy into .env.local).
-8. If I set up a database in step 7: npm run db:push
+   Both can be added later. If I want them now, walk me through each
+   one at a time (sign up, where to click, what to copy into .env.local).
+9. If I set up a database in step 8: npm run db:push
    If I skipped it, skip this too.
-9. npm run dev — confirm I can open http://localhost:3003
+10. npm run dev — confirm I can open http://localhost:3003. I should get
+    redirected to a Clerk-hosted sign-in page; signing in lands me back
+    on the home page at /.
+11. When I'm ready to deploy, walk me through Railway:
+    - Install the Railway CLI if I don't have it: npm install -g @railway/cli
+    - railway login, then railway link to an existing project OR railway init
+    - Set env vars via the CLI. IMPORTANT: NEXT_PUBLIC_* vars are inlined
+      into the client bundle during `next build`, so they MUST be set
+      before the first push or the build will fail. Give me this as a
+      single command I can run after replacing the placeholders:
+
+        railway variables --set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_... --set CLERK_SECRET_KEY=sk_live_...
+
+      Add DATABASE_URL and OPENAI_API_KEY to that same command if I set
+      those up in step 8.
+    - Push to main — Railway auto-builds and deploys.
+    - If I created a Clerk production instance: add my Railway domain under
+      Clerk → Domains, or Clerk will reject prod sign-ins as an
+      unauthorized origin and every attempt fails silently. (The Clerk
+      development instance skips this — it accepts any domain.)
 
 If anything fails, help me debug patiently. Start now.
 ```
@@ -61,7 +88,7 @@ These must be installed and working before setup. The prompt above will guide yo
 | **git** | `git --version` | macOS: `xcode-select --install` |
 | **Homebrew** | `brew --version` | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
 | **nvm** | `nvm --version` | `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh \| bash` |
-| **Node.js** | `node --version` | `nvm install 20` |
+| **Node.js** | `node --version` | `nvm install` (reads `.nvmrc` — currently v24) |
 | **GitHub CLI** | `gh auth status` | `brew install gh` then `gh auth login` |
 | **Railway CLI** | `railway --version` | `npm install -g @railway/cli` |
 
